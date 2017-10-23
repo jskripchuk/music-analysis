@@ -1,44 +1,92 @@
 import music21
+from music21 import roman
 
-clarity = music21.converter.parse('clarity.mxl')
+clarity = music21.converter.parse('data-files/clarityEasy.mxl')
 ##sBach.show()
+
+
+mode = "major"
+key = clarity.flat.getElementsByClass("KeySignature")[0].asKey(mode)
+
+
 
 melody = clarity.parts[0]
 harmony = clarity.parts[1]
 
-#clarity.show()
-
-stack = clarity.measure(1)
-#stack.show()
-
-#chordify.show()
+stack = clarity
 
 stack = stack.stripTies()
-#stack.show()
 flat = stack.flat
-#stack.show()
+
+notes = []
+
+
+for i in melody.stripTies().flat.getElementsByClass("Note"):
+	notes.append(i)
+	#print(i)
+
+chords = []
+
+for i in harmony.stripTies().flat.getElementsByClass("Note"):
+	#print(i.lyric)
+	numeral = roman.RomanNumeral(i.lyric)
+	numeral.key = key
+	numeral.writeAsChord=True
+	numeral.offset = i.offset
+	numeral.duration = i.duration
+	print(numeral.pitches)
+	chords.append(numeral)
+	#print(roman.RomanNumeral("V").writeAsChord=True)
 
 
 
-print("Note start times")
-for i in flat.getElementsByClass("Note"):
-    print(i.offset)
 
-print("")
+
+for i in flat.getElementsByClass("Chord"):
+	i.melodyChordTones = []
+	i.melodyIntervals = []
+	i.melodyIntervalsSimple = []
+	chords.append(i)
+	
+
+
 
 #if the start of a melody note falls within the duration range, then count it as
 #part of the chord
 #eg. start <= node < end (non inclusive)
-print("   ")
 
-for i in flat.getElementsByClass("Chord"):
-    print(i.offset)
-    print(i.duration.quarterLength)
-    print("----")
+#Melody Intervals is the interval between the root of the chord and the melody note
+#Compressed within an octave, so 2nds=9th, 4ths=11th 6ths can be 13ths too
 
-#stack.show()
+#Can also just have students put the roman numeral name?
+def fillChordTonesHard(chords):
+	noteIndex = 0
+	for chord in chords:
+		while noteIndex < len(notes):
+			currentNote = notes[noteIndex]
+			chordEnd = chord.duration.quarterLength+chord.offset
 
-#for i in harmony.recurse():
-    #print(i)
 
-#print(notes[1].activeSite)
+			if currentNote.offset >= chord.offset and currentNote.offset < chordEnd:
+				chord.melodyChordTones.append(currentNote)
+				interval = music21.interval.Interval(chord.root(),currentNote.pitch)
+				chord.melodyIntervals.append(interval)
+				chord.melodyIntervalsSimple.append(interval.simpleName)
+				noteIndex+=1
+			else:
+				break
+
+for chord in chords:
+	#print(chord)
+	#print(chord.melodyChordTones)
+	#print(chord.melodyIntervalsSimple)
+	#print(chord.melodyIntervals)
+	#print(chord.melodyChordTones)
+	print()
+	
+
+#Now have chords and their melody chord tones
+#If two chords have the same closed position
+
+		
+		
