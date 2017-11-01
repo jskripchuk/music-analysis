@@ -1,7 +1,7 @@
 import music21
 from music21 import roman
 
-clarity = music21.converter.parse('data-files/clarityEasy.mxl')
+clarity = music21.converter.parse('data-files/clarity.mxl')
 ##sBach.show()
 
 
@@ -27,15 +27,15 @@ for i in melody.stripTies().flat.getElementsByClass("Note"):
 
 chords = []
 
-for i in harmony.stripTies().flat.getElementsByClass("Note"):
+#for i in harmony.stripTies().flat.getElementsByClass("Note"):
 	#print(i.lyric)
-	numeral = roman.RomanNumeral(i.lyric)
-	numeral.key = key
-	numeral.writeAsChord=True
-	numeral.offset = i.offset
-	numeral.duration = i.duration
-	print(numeral.pitches)
-	chords.append(numeral)
+	#numeral = roman.RomanNumeral(i.lyric)
+	#numeral.key = key
+	#numeral.writeAsChord=True
+	#numeral.offset = i.offset
+	#numeral.duration = i.duration
+	#print(numeral.pitches)
+	#chords.append(numeral)
 	#print(roman.RomanNumeral("V").writeAsChord=True)
 
 
@@ -43,6 +43,7 @@ for i in harmony.stripTies().flat.getElementsByClass("Note"):
 
 
 for i in flat.getElementsByClass("Chord"):
+	#print(i)
 	i.melodyChordTones = []
 	i.melodyIntervals = []
 	i.melodyIntervalsSimple = []
@@ -76,12 +77,17 @@ def fillChordTonesHard(chords):
 			else:
 				break
 
+fillChordTonesHard(chords)
+
 for chord in chords:
-	#print(chord)
+	print("====================================")
+	print(chord)
+	#print(chord.commonName)
 	#print(chord.melodyChordTones)
-	#print(chord.melodyIntervalsSimple)
+	print(chord.melodyIntervalsSimple)
 	#print(chord.melodyIntervals)
 	#print(chord.melodyChordTones)
+	print("====================================")
 	print()
 	
 
