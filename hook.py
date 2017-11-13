@@ -117,6 +117,5 @@ def getData(dom, tag):
 		return dom.getElementsByTagName(tag)[0].childNodes[0].data
 
 
-seal = HKTObject("data-files/seal.hkt")
-print(seal.key)
+
 
