@@ -4,7 +4,7 @@ import xml.dom.minidom
 
 
 class Note:
-	def __init__(self, start_beat_abs, start_measure, note_length, 
+	def __init__(self, start_beat_abs, start_measure, note_length,
 				scale_degree, octave, isRest):
 		self.start_beat_abs = start_beat_abs
 		self.start_measure = start_measure
@@ -12,9 +12,9 @@ class Note:
 		self.scale_degree= scale_degree
 		self.octave = octave
 		self.isRest = isRest
-		
+
 class Chord:
-	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate, borrowed, 
+	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate, borrowed,
 			chord_duration, start_measure, start_beat, start_beat_abs, isRest):
 		self.scale_degree = scale_degree
 		self.fb = fb
@@ -42,8 +42,8 @@ def createChord(chordDom):
 	start_beat = getData(chordDom, "start_beat")
 	start_beat_abs = getData(chordDom, "start_beat_abs")
 	isRest = getData(chordDom, "isRest")
-	
-	chord = Chord(scale_degree, fb, sec, sus, pedal, alternate, borrowed, 
+
+	chord = Chord(scale_degree, fb, sec, sus, pedal, alternate, borrowed,
 		chord_duration, start_measure, start_beat, start_beat_abs, isRest)
 
 	return chord
@@ -67,12 +67,16 @@ class Segment:
 		for i in self.chords:
 			print(i.scale_degree)
 
+#mode
+#1=major
+#2 = dorian
+#3 = prygian
 class HKTObject:
 	def __init__(self, filepath):
 
 		DOMTree = xml.dom.minidom.parse(filepath)
 		collection = DOMTree.documentElement
-		
+
 		self.segments = []
 		self.artist = getData(collection, "artist")
 		self.title = getData(collection, "title")
@@ -80,7 +84,7 @@ class HKTObject:
 		self.key = getData(collection, "key")
 		self.mode = getData(collection, "mode")
 		self.youtubeID = getData(collection, "YouTubeID")
-		
+
 		for segment in DOMTree.getElementsByTagName("segment"):
 			self.segments.append(createSegment(segment))
 
@@ -104,7 +108,7 @@ def createNote(noteDom):
 	octave = getData(noteDom, "octave")
 	isRest = getData(noteDom, "isRest")
 
-	note = Note(start_beat_abs, start_measure, note_length, 
+	note = Note(start_beat_abs, start_measure, note_length,
 			scale_degree, octave, isRest)
 
 	return note
@@ -115,7 +119,3 @@ def getData(dom, tag):
 		return None
 	else:
 		return dom.getElementsByTagName(tag)[0].childNodes[0].data
-
-
-
-

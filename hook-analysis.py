@@ -8,7 +8,7 @@ melody = seal.segments[0].melody
 
 def getScaleDegreeHistogram(melody): #Only diatonic currently
 	histogram = [0,0,0,0,0,0,0]
-	
+
 	for note in melody:
 		sd = note.scale_degree
 		#print(sd + ":" +note.octave)
@@ -28,7 +28,7 @@ def getIntervalHistogram(melody): #Only diatonic currently
 	for i in range(0,len(melody)-1):
 		note1 = melody[i]
 		note2 = melody[i+1]
-		
+
 		try:
 			note1Val = getAbsoluteScaleDegree(note1)
 
@@ -45,7 +45,7 @@ import statistics
 def calculateContourAndRange(melody):
 	contourChanges = 0
 	melodyRange = 0
-	
+
 	minNote = 0
 	maxNote = 0
 
@@ -65,9 +65,9 @@ def calculateContourAndRange(melody):
 			maxNote = max(absolute1,maxNote)
 
 			diff = absolute2-absolute1
-			
+
 			currentNotesPerCSeg += 1
-			
+
 
 			if diff > 0 and not increasing:
 				contourChanges += 1
@@ -79,21 +79,21 @@ def calculateContourAndRange(melody):
 				increasing = not increasing
 				notesPerCSeg.append(currentNotesPerCSeg)
 				currentNotesPerCSeg = 0
-			
+
 		except:
 			False
-	
+
 	##close enough i guess
 	melodyRange = maxNote-minNote
 	print("Range: "+str(melodyRange))
 	print("Num Contour Changes: "+str(contourChanges))
 	print("Notes per CSeg:" +str(notesPerCSeg))
-	
+
 	cursum = 0
 	for i in notesPerCSeg:
 		cursum+=i
 	avgCseg = cursum/len(notesPerCSeg)
-	print("Average notes per Cseg: "+str(avgCseg))	
+	print("Average notes per Cseg: "+str(avgCseg))
 	print("StDv Cseg: "+str(statistics.stdev(notesPerCSeg)))
 
 
@@ -103,9 +103,9 @@ def getAbsoluteScaleDegree(note):
 
 def probDistFromHistogram(hist):
 	totalSum = 0
-	
-	histCopy = list(hist)	
-	
+
+	histCopy = list(hist)
+
 	for i in hist:
 		totalSum+=i
 
@@ -113,7 +113,7 @@ def probDistFromHistogram(hist):
 		histCopy[i] = histCopy[i]/totalSum
 
 	return histCopy
-		
+
 
 sdHist = getScaleDegreeHistogram(melody)
 intervalHist = getIntervalHistogram(melody)
