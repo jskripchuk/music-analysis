@@ -15,7 +15,7 @@ class Note:
 
 class Chord:
 	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate, borrowed,
-			chord_duration, start_measure, start_beat, start_beat_abs, isRest):
+			chord_duration, start_measure, start_beat, start_beat_abs, isRest,emb):
 		self.scale_degree = scale_degree
 		self.fb = fb
 		self.sec = sec
@@ -28,6 +28,7 @@ class Chord:
 		self.start_beat = start_beat
 		self.start_beat_abs = start_beat_abs
 		self.isRest = isRest
+		self.emb = emb
 
 def createChord(chordDom):
 	scale_degree = getData(chordDom, "sd")
@@ -42,9 +43,10 @@ def createChord(chordDom):
 	start_beat = getData(chordDom, "start_beat")
 	start_beat_abs = getData(chordDom, "start_beat_abs")
 	isRest = getData(chordDom, "isRest")
+	emb = getData(chordDom,"emb")
 
 	chord = Chord(scale_degree, fb, sec, sus, pedal, alternate, borrowed,
-		chord_duration, start_measure, start_beat, start_beat_abs, isRest)
+		chord_duration, start_measure, start_beat, start_beat_abs, isRest,emb)
 
 	return chord
 
@@ -115,6 +117,9 @@ def createNote(noteDom):
 
 
 def getData(dom, tag):
+	if len(dom.getElementsByTagName(tag)) == 0:
+		return None
+
 	if len(dom.getElementsByTagName(tag)[0].childNodes) == 0:
 		return None
 	else:
