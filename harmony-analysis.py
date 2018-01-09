@@ -115,7 +115,6 @@ def parseChord(chord):
     sd = int(chord.scale_degree)-1
 
     if chord.borrowed != None:
-        ###TODO FIX EXTENSIONS ON BORROWED CHORDS
         return handleBorrowedChord(chord)
     elif chord.sec != None:
         return handleSecondaryChord(chord)
