@@ -1,6 +1,6 @@
 import hook
 
-seal = hook.HKTObject("data-files/test1.hkt")
+hktFile = hook.HKTObject("data-files/tennis.hkt")
 
 #Borred
 #Returns a number that gives how many flats/sharps it is to the other mode
@@ -8,6 +8,9 @@ seal = hook.HKTObject("data-files/test1.hkt")
 
 #need to take care of types of sevenths
 
+
+#TODO: Remove o from diminished chords when adding extension
+#Not really pressing
 
 major = ["I","ii","iii","IV","V","vi","viio"]
 dorian = ["i","ii","III","IV","v","vio","VII"]
@@ -54,7 +57,6 @@ seventh_qualities = [maj7,min7,min7,maj7,dom7,min7,min7b5]
 ninth_qualities = [maj9,min9,flat9,maj9,dom9,min9,flat9]
 
 
-
 #General Algorithms
 #Handle borrowed chords
 #Hanled Sec Chords
@@ -81,7 +83,15 @@ def handleBorrowedChord(chord):
 
     roman = modes_flat_order[int(chord.borrowed)+5][sd]
 
-    ext = getExtensionSymbol(chord,sd)
+    #locrian, prygh, min, dorian, mixo, major, lydian
+    #maj, dor, prygh, lyd, mix, min, loc
+    #swap is a map between flat order modes and scale order modes
+
+    swap = [6,2,5,1,4,0,3]
+    borrowNum = swap[int(chord.borrowed)+5]
+    index = (borrowNum+sd)%7
+
+    ext = getExtensionSymbol(chord,index)
     emb = getEmbellishment(chord)
 
     return accidental+roman+ext+emb
@@ -98,7 +108,7 @@ def getEmbellishment(chord):
     else:
         return ""
 
-current_mode_num = int(seal.mode)-1
+current_mode_num = int(hktFile.mode)-1
 current_mode = modes_scale_order[current_mode_num]
 
 def parseChord(chord):
@@ -106,38 +116,67 @@ def parseChord(chord):
 
     if chord.borrowed != None:
         ###TODO FIX EXTENSIONS ON BORROWED CHORDS
-        return(handleBorrowedChord(chord))
+        return handleBorrowedChord(chord)
     elif chord.sec != None:
-        return "secondary"
+        return handleSecondaryChord(chord)
     else:
-        return current_mode[sd]+getExtensionSymbol(chord,sd)+getEmbellishment(chord)
+        index = (sd+current_mode_num)%7
+        return current_mode[sd]+getExtensionSymbol(chord,index)+getEmbellishment(chord)
 
 #print(current_mode_num)
 
-def chordToRomanNumeral(chord):
+def handleSecondaryChord(chord):
     #print(chord.fb)
     #Check if it is a secondary chord
     #print(chord.sec)
-    if chord.sec != None:
-        extensionSymbol = "7"
+
+    #defaults to
+    extensionSymbol = ""
+    sec = ""
+
+    if chord.scale_degree == "5":
         sec = "V"
-        if chord.scale_degree == "4":
-            sec = "IV"
+    elif chord.scale_degree == "4":
+        sec = "IV"
+    elif chord.scale_degree == "7":
+        sec = "viio"
+
+    if chord.fb == "7":
+        if chord.scale_degree == "5":
+            extensionSymbol = dom7
+        elif chord.scale_degree == "4":
+            extensionSymbol = maj7
         elif chord.scale_degree == "7":
-            sec = "viio"
-        return sec+"/"+current_mode[int(chord.sec)-1]
+            extensionSymbol = min7b5
+    elif chord.fb == "9":
+        if chord.scale_degree == "5":
+            extensionSymbol = dom9
+        elif chord.scale_degree == "4":
+            extensionSymbol = maj9
+        elif chord.scale_degree == "7":
+            extensionSymbol = min7b9
+    elif chord.fb == "11":
+            extensionSymbol = "11"
+    elif chord.fb == None:
+            extensionSymbol = ""
+    else:
+            extensionSymbol = chord.fb
+
+    emb = getEmbellishment(chord)
+    return sec+extensionSymbol+emb+"/"+current_mode[int(chord.sec)-1]
+    #return sec+"/"+current_mode[int(chord.sec)-1]
 
     #Add embellishments
     #add extensions
 
 
 
-def getExtensionSymbol(chord,sd):
+def getExtensionSymbol(chord,index):
     #print(chord.fb)
     if chord.fb == "7":
-        return seventh_qualities[(sd+current_mode_num)%7]
+        return seventh_qualities[index]
     elif chord.fb == "9":
-        return ninth_qualities[(sd+current_mode_num)%7]
+        return ninth_qualities[index]
     elif chord.fb == "11":
         return "11"
     elif chord.fb == None:
@@ -145,10 +184,10 @@ def getExtensionSymbol(chord,sd):
     else:
         return chord.fb
 
-for segment in seal.segments:
-    for chord in segment.chords:
-            print(parseChord(chord))
-            #print(chord.emb)
 
-            print("-")
-    print("-----")
+for segment in hktFile.segments:
+    string = ""
+    for chord in segment.chords:
+            string = string+parseChord(chord)+"-"
+            #print(chord.emb)
+    print(string)

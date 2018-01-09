@@ -42,7 +42,7 @@
     <duration>15</duration>
     <active_start>0</active_start>
     <active_stop>0.27</active_stop>
-    <fingerprint>369366</fingerprint>
+    <fingerprint>883990</fingerprint>
   </meta>
   <data>
     <segment>
@@ -125,7 +125,7 @@
         </chord>
         <chord>
           <sd>3</sd>
-          <fb>7</fb>
+          <fb>43</fb>
           <sec/>
           <sus/>
           <pedal/>
