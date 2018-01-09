@@ -1,6 +1,7 @@
+import chord_to_roman
+
 from xml.dom.minidom import parse
 import xml.dom.minidom
-
 
 
 class Note:
@@ -90,10 +91,14 @@ class HKTObject:
 		for segment in DOMTree.getElementsByTagName("segment"):
 			self.segments.append(createSegment(segment))
 
+		for segment in self.segments:
+			for chord in segment.chords:
+				chord.roman = chord_to_roman.parseChord(chord,self.mode)
+				print(chord.roman)
+
 
 def createSegment(segmentDom):
 	segment = Segment()
-
 	for note in segmentDom.getElementsByTagName("note"):
 		segment.addNote(createNote(note))
 

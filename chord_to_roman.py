@@ -1,6 +1,6 @@
-import hook
+#import hook
 
-hktFile = hook.HKTObject("data-files/tennis.hkt")
+#hktFile = hook.HKTObject("data-files/tennis.hkt")
 
 #Borred
 #Returns a number that gives how many flats/sharps it is to the other mode
@@ -68,7 +68,7 @@ ninth_qualities = [maj9,min9,flat9,maj9,dom9,min9,flat9]
 #reseult < 0, it's flat
 #result = 0, no change
 
-def handleBorrowedChord(chord):
+def handleBorrowedChord(chord,current_mode,current_mode_num):
     accidental = ""
 
     borrowFrom = mode_int_flat_order[int(chord.borrowed)+5]
@@ -108,23 +108,24 @@ def getEmbellishment(chord):
     else:
         return ""
 
-current_mode_num = int(hktFile.mode)-1
-current_mode = modes_scale_order[current_mode_num]
 
-def parseChord(chord):
+def parseChord(chord, modeNum):
     sd = int(chord.scale_degree)-1
 
+    current_mode_num = int(modeNum)-1
+    current_mode = modes_scale_order[current_mode_num]
+
     if chord.borrowed != None:
-        return handleBorrowedChord(chord)
+        return handleBorrowedChord(chord,current_mode,current_mode_num)
     elif chord.sec != None:
-        return handleSecondaryChord(chord)
+        return handleSecondaryChord(chord,current_mode,current_mode_num)
     else:
         index = (sd+current_mode_num)%7
         return current_mode[sd]+getExtensionSymbol(chord,index)+getEmbellishment(chord)
 
 #print(current_mode_num)
 
-def handleSecondaryChord(chord):
+def handleSecondaryChord(chord,current_mode,current_mode_num):
     #print(chord.fb)
     #Check if it is a secondary chord
     #print(chord.sec)
@@ -184,9 +185,9 @@ def getExtensionSymbol(chord,index):
         return chord.fb
 
 
-for segment in hktFile.segments:
-    string = ""
-    for chord in segment.chords:
-            string = string+parseChord(chord)+"-"
+#for segment in hktFile.segments:
+#    string = ""
+#    for chord in segment.chords:
+#            string = string+parseChord(chord)+"-"
             #print(chord.emb)
-    print(string)
+#    print(string)
