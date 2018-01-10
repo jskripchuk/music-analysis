@@ -93,9 +93,9 @@ class HKTObject:
 
 		for segment in self.segments:
 			for chord in segment.chords:
+				#Oh I feel super bad for tacking on extension quality but it's gotta be done
+				chord.extension_disc = ""
 				chord.roman = chord_to_roman.parseChord(chord,self.mode)
-				print(chord.roman)
-
 
 def createSegment(segmentDom):
 	segment = Segment()
