@@ -55,12 +55,16 @@ class Segment:
 	def __init__(self):
 		self.melody = []
 		self.chords = []
+		self.chordsNoRest = []
 
 	def addNote(self,note):
 		self.melody.append(note)
 
 	def addChord(self, chord):
 		self.chords.append(chord)
+
+	def addChordNoRest(self,chord):
+		self.chordsNoRest.append(chord)
 
 	def printNotes(self):
 		for i in self.melody:
@@ -95,7 +99,13 @@ class HKTObject:
 			for chord in segment.chords:
 				#Oh I feel super bad for tacking on extension quality but it's gotta be done
 				chord.extension_disc = ""
-				chord.roman = chord_to_roman.parseChord(chord,self.mode)
+				if chord.isRest == "0":
+					chord.roman = chord_to_roman.parseChord(chord,self.mode)
+					segment.addChordNoRest(chord)
+				else:
+					chord.roman = "REST"
+
+		#Populate no rest arr
 
 def createSegment(segmentDom):
 	segment = Segment()

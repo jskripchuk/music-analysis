@@ -95,6 +95,7 @@ def handleBorrowedChord(chord,current_mode,current_mode_num):
     emb = getEmbellishment(chord)
 
     chord.extension_disc = ext
+    chord.roman_basic = accidental+roman
 
     return accidental+roman+ext+emb
     #return accidental
@@ -124,6 +125,7 @@ def parseChord(chord, modeNum):
     else:
         index = (sd+current_mode_num)%7
         chord.extension_disc = getExtensionSymbol(chord,index)
+        chord.roman_basic = current_mode[sd]
         return current_mode[sd]+chord.extension_disc+getEmbellishment(chord)
 
 #print(current_mode_num)
@@ -166,6 +168,7 @@ def handleSecondaryChord(chord,current_mode,current_mode_num):
             extensionSymbol = chord.fb
 
     chord.extension_disc = extensionSymbol
+    chord.roman_basic = sec+"/"+current_mode[int(chord.sec)-1]
     emb = getEmbellishment(chord)
     return sec+extensionSymbol+emb+"/"+current_mode[int(chord.sec)-1]
     #return sec+"/"+current_mode[int(chord.sec)-1]

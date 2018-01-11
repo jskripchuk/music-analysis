@@ -2,8 +2,14 @@ import hook
 
 import plotly.plotly
 import plotly.graph_objs as go
+from os import listdir
 
-s = hook.HKTObject("data-files/tennis.hkt")
+import markovify
+
+#s = hook.HKTObject("data-files/polygon_dust.hkt")
+
+#Load in all songs
+
 
 
 
@@ -30,27 +36,24 @@ def createHistogram(song, segFunc, varFunc):
 #extensions
 
 
-def analyzeHarmony(song):
-    #chord_histogram = createChordHistogram(s)
-    getChords = lambda segment: segment.chords
 
-    getRoman = lambda chord: chord.roman
-    getExtensions = lambda chord: chord.extension_disc
+def diatonicVsNondiatonic(song):
+    vs = {"Diatonic": 0, "Nondiatonic": 0}
 
-    chord_frequency = createHistogram(s,getChords,getRoman)
-    extension_frequency = createHistogram(s,getChords,getExtensions)
-    #print(createHistogram(s,getChords,extension_disc))
-    plotBarChartFromDict(extension_frequency)
-    #generateGraphs(chord_histogram)
-    #print(chord_histogram)
+    for segment in song.segments:
+        for chord in segment.chords:
+            if chord.borrowed == None:
+                vs["Diatonic"]+=1
+            else:
+                vs["Nondiatonic"]+=1
+
+
+    print(vs)
 
 #def generateGraphs():
     #plotBarChart()
 
 def plotBarChartFromDict(dic):
-    #print(list(dic.keys()))
-    #print(list(dic.values()))
-    #plotBarChart(["7","3","2"],[2,5,1])
     plotBarChart(list(dic.keys()), list(dic.values()))
 
 def plotBarChart(x_data, y_data):
@@ -69,7 +72,61 @@ def plotBarChart(x_data, y_data):
     fig = go.Figure(data = data_comp, layout=layout_comp)
     plotly.offline.plot(fig, filename='basic-bar')
 
-analyzeHarmony(s)
+
+def analyzeHarmony(song):
+    #chord_histogram = createChordHistogram(s)
+    getChords = lambda segment: segment.chords
+    getChordsNoRest = lambda segment: segment.chordsNoRest
+
+    getRoman = lambda chord: chord.roman
+    getExtensions = lambda chord: chord.extension_disc
+    getSus = lambda chord: chord.sus
+
+
+    #HOW OFTEN EACH CHORD SHOWS UP
+    chord_frequency = createHistogram(song,getChords,getRoman)
+    #HOW OFTEN EACH TYPE OF EXTENSION SHOWS UP
+    #extension_frequency = createHistogram(s,getChords,getExtensions)
+    #suspension_frequency = createHistogram(s,getChords,getSus)
+
+    #plotBarChartFromDict(suspension_frequency)
+    #DIATONIC VS NON-DIATONIC CHORDS
+    #diatonicVsNondiatonic(song)
+
+    plotBarChartFromDict(chord_frequency)
+
+
+
+##TODO PROBLEM WITH MODES
+def batchAnalyze(folder):
+    songs = []
+    for filename in listdir(folder):
+        path = folder+"/"+filename
+        new_song = hook.HKTObject(path)
+        songs.append(new_song)
+
+    #DO THE MARKOV
+    markovs = []
+    for song in songs:
+        text = ""
+        if song.mode == "1":
+            for segment in song.segments:
+                for chord in segment.chordsNoRest:
+                    text+=chord.roman_basic+" "
+                    model = markovify.Text(text,state_size=1)
+                    markovs.append(model)
+
+    combo = markovify.combine(markovs)
+    for i in range(5):
+        print(combo.make_sentence())
+
+
+    #print(songs)
+        #print(path)
+
+batchAnalyze("data-files/porter_robinson")
+
+#analyzeHarmony(s)
 #for key in chord_histogram:
     #print(key)
 
