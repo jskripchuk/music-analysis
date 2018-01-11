@@ -1,4 +1,4 @@
-import hook
+import hkt_generator
 
 import plotly.plotly
 import plotly.graph_objs as go
@@ -102,7 +102,7 @@ def batchAnalyze(folder):
     songs = []
     for filename in listdir(folder):
         path = folder+"/"+filename
-        new_song = hook.HKTObject(path)
+        new_song = hkt_generator.HKTObject(path)
         songs.append(new_song)
 
     #DO THE MARKOV

@@ -15,8 +15,9 @@ class Note:
 		self.isRest = isRest
 
 class Chord:
-	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate, borrowed,
-			chord_duration, start_measure, start_beat, start_beat_abs, isRest,emb):
+	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate,
+				borrowed, chord_duration, start_measure, start_beat,
+				start_beat_abs, isRest,emb):
 		self.scale_degree = scale_degree
 		self.fb = fb
 		self.sec = sec
@@ -97,7 +98,6 @@ class HKTObject:
 
 		for segment in self.segments:
 			for chord in segment.chords:
-				#Oh I feel super bad for tacking on extension quality but it's gotta be done
 				chord.extension_disc = ""
 				if chord.isRest == "0":
 					chord.roman = chord_to_roman.parseChord(chord,self.mode)
