@@ -5,6 +5,17 @@ import xml.dom.minidom
 
 
 class Note:
+	"""
+	Note represents the XML representation of a hooktheory note
+
+	Args:
+		start_beat_abs (str):
+		start_measure (str):
+		note_length (str):
+		scale_degree (str):
+		octave (str):
+		isRest (str):
+	"""
 	def __init__(self, start_beat_abs, start_measure, note_length,
 				scale_degree, octave, isRest):
 		self.start_beat_abs = start_beat_abs
@@ -15,6 +26,29 @@ class Note:
 		self.isRest = isRest
 
 class Chord:
+	"""
+	Chord represents the XML representation of a hooktheory chord
+
+	Args:
+		scale_degree (str):
+		fb (str):
+		sec (str):
+		sus (str):
+		pedal (str):
+		alternate (str):
+		borrwed (str):
+		chord_duration (str):
+		start_measure (str):
+		start_beat (str):
+		start_beat_abs (str):
+		isRest (str):
+		emb (str):
+		roman (str):
+		roman_basic (str):
+		extension_disc (str):
+		accidental(str):
+	"""
+
 	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate,
 				borrowed, chord_duration, start_measure, start_beat,
 				start_beat_abs, isRest,emb):
@@ -31,6 +65,10 @@ class Chord:
 		self.start_beat_abs = start_beat_abs
 		self.isRest = isRest
 		self.emb = emb
+		self.roman = ""
+		self.roman_basic = ""
+		self.extension_disc = ""
+		self.accidental = ""
 
 def createChord(chordDom):
 	scale_degree = getData(chordDom, "sd")

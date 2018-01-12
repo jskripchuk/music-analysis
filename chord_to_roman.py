@@ -86,7 +86,7 @@ ninth_qualities = [maj9,min9,flat9,maj9,dom9,min9,flat9]
 
 def handleBorrowedChord(chord,current_mode,current_mode_num):
     """
-    Takes in a borrwed chord, and then converts it to it's correct roman
+    Takes in a HKT borrwed chord, and then converts it to it's correct roman
     numeral notation.
 
     Args:
@@ -137,6 +137,7 @@ def handleBorrowedChord(chord,current_mode,current_mode_num):
 
     chord.extension_disc = ext
     chord.roman_basic = accidental+roman
+    chord.accidental = accidental
 
     return accidental+roman+ext+emb
 
@@ -162,6 +163,81 @@ def getEmbellishment(chord):
     else:
         return ""
 
+def handleSecondaryChord(chord,current_mode,current_mode_num):
+    """
+    Takes a HKT secondary chord and parses it into roman numeral notation
+
+    Args:
+        chord: An HKT chord object.
+        current_mode: An array with diatonic chord strings of the current mode.
+        current_mode_num: The Hooktheory number representation of the mode.
+
+    Returns:
+        The secondary HKT chord in roman numeral notation.
+    """
+
+    extensionSymbol = ""
+    sec = ""
+
+    if chord.scale_degree == "5":
+        sec = "V"
+    elif chord.scale_degree == "4":
+        sec = "IV"
+    elif chord.scale_degree == "7":
+        sec = "viio"
+
+
+    #Extension types are fixed, so no need to look into the qualties arr
+    if chord.fb == "7":
+        if chord.scale_degree == "5":
+            extensionSymbol = dom7
+        elif chord.scale_degree == "4":
+            extensionSymbol = maj7
+        elif chord.scale_degree == "7":
+            extensionSymbol = min7b5
+    elif chord.fb == "9":
+        if chord.scale_degree == "5":
+            extensionSymbol = dom9
+        elif chord.scale_degree == "4":
+            extensionSymbol = maj9
+        elif chord.scale_degree == "7":
+            extensionSymbol = min7b9
+    elif chord.fb == "11":
+            extensionSymbol = eleventh
+    elif chord.fb == None:
+            extensionSymbol = ""
+    else:
+            extensionSymbol = chord.fb
+
+    chord.extension_disc = extensionSymbol
+    chord.roman_basic = sec+"/"+current_mode[int(chord.sec)-1]
+    emb = getEmbellishment(chord)
+
+    return sec+extensionSymbol+emb+"/"+current_mode[int(chord.sec)-1]
+
+def getExtensionSymbol(chord,index):
+    """
+    Takes a HKT secondary chord and parses it into roman numeral notation
+
+    Args:
+        chord: An HKT chord object.
+        current_mode: An array with diatonic chord strings of the current mode.
+        current_mode_num: The Hooktheory number representation of the mode.
+
+    Returns:
+        The secondary HKT chord in roman numeral notation.
+    """
+
+    if chord.fb == "7":
+        return seventh_qualities[index]
+    elif chord.fb == "9":
+        return ninth_qualities[index]
+    elif chord.fb == "11":
+        return eleventh
+    elif chord.fb == None:
+        return ""
+    else:
+        return chord.fb
 
 def parseChord(chord, modeNum):
     """
@@ -195,53 +271,3 @@ def parseChord(chord, modeNum):
         chord.extension_disc = getExtensionSymbol(chord,index)
         chord.roman_basic = current_mode[sd]
         return current_mode[sd]+chord.extension_disc+getEmbellishment(chord)
-
-
-def handleSecondaryChord(chord,current_mode,current_mode_num):
-    extensionSymbol = ""
-    sec = ""
-
-    if chord.scale_degree == "5":
-        sec = "V"
-    elif chord.scale_degree == "4":
-        sec = "IV"
-    elif chord.scale_degree == "7":
-        sec = "viio"
-
-    if chord.fb == "7":
-        if chord.scale_degree == "5":
-            extensionSymbol = dom7
-        elif chord.scale_degree == "4":
-            extensionSymbol = maj7
-        elif chord.scale_degree == "7":
-            extensionSymbol = min7b5
-    elif chord.fb == "9":
-        if chord.scale_degree == "5":
-            extensionSymbol = dom9
-        elif chord.scale_degree == "4":
-            extensionSymbol = maj9
-        elif chord.scale_degree == "7":
-            extensionSymbol = min7b9
-    elif chord.fb == "11":
-            extensionSymbol = eleventh
-    elif chord.fb == None:
-            extensionSymbol = ""
-    else:
-            extensionSymbol = chord.fb
-
-    chord.extension_disc = extensionSymbol
-    chord.roman_basic = sec+"/"+current_mode[int(chord.sec)-1]
-    emb = getEmbellishment(chord)
-    return sec+extensionSymbol+emb+"/"+current_mode[int(chord.sec)-1]
-
-def getExtensionSymbol(chord,index):
-    if chord.fb == "7":
-        return seventh_qualities[index]
-    elif chord.fb == "9":
-        return ninth_qualities[index]
-    elif chord.fb == "11":
-        return eleventh
-    elif chord.fb == None:
-        return ""
-    else:
-        return chord.fb
