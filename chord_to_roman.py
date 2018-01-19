@@ -28,8 +28,9 @@ mixo_int = [0,0,0,0,0,0,-1]
 minor_int = [0,0,-1,0,0,-1,-1]
 loc_int =[0,-1,-1,0,-1,-1,-1]
 
-#Hooktheory uses a "flat order" representation for borrwed Chord
+#Hooktheory uses a "flat order" representation for a borrwed Chord
 #However uses a "scale order" when represeting the mode of a whole Song
+#Let it be known, it was quite a pain to deal with.
 
 #FLAT ORDER
 #If the major scale has 0 flats, each mode is represnted by how many flats it is

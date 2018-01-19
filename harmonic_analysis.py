@@ -1,29 +1,43 @@
 import hkt_generator
+import statistics
+import markovify
+import graphing
 from random import random
 from bisect import bisect
-import statistics
-
-
-import plotly.plotly
-import plotly.graph_objs as go
 from os import listdir
 
-import markovify
+"""
+harmonic_analysis.py
 
-#s = hook.HKTObject("data-files/polygon_dust.hkt")
+Takes the Hooktheory corpus of an artist and performs a statistical analysis,
+of the harmony. Also creates a markov model that can generate a harmonic
+progression and rhythm.
 
-#Load in all songs
+"""
 
-#TODO
-#Another folly, rythem repeats of one chord
-
-
-
-
-#Creates a histogram of the all the chords in all the segments
-#Uses a dictionary
-#Also uses lambda expressions because yes
 def createHistogram(songs, segFunc, varFunc):
+    """
+    Taks in a list of songs, and creates a histogram (dictionary)
+    based on the qualities desired with the lambda functions segFunc and varFunc.
+
+    Args:
+        songs (list of HKTObject): A list of all songs to be analyzed
+        segFunc (lambda): A function that returns the part of a segment
+            in HKTObject. (Either the chords or the melody)
+        varFunc (lambda): A function that returns the quality of the item that
+            we wish to make a histogram out of.
+            (Eg. Roman Numeral, seventh quality, suspension...)
+
+    Returns:
+        A dictionary that contains a tally of how many times a certain quality
+        occurs in the specified part of the segment. For example:
+
+        Progression: I-IV-I-V
+        hist["I"] = 2
+        hist["IV"] = 1
+        hist["V"] = 1
+    """
+
     histogram = dict()
 
     for song in songs:
@@ -31,136 +45,62 @@ def createHistogram(songs, segFunc, varFunc):
             for obj in segFunc(segment):
                 inHisto = False
 
+                #If it is in the histogram, then increment the tally
                 for key in histogram:
                     if varFunc(obj) == key:
                         histogram[key]+=1
                         inHisto = True
                         break
 
+                #If it is not in the histogram, then add it and tally it
                 if not inHisto:
                     histogram[varFunc(obj)] = 1
 
     return histogram
-#extensions
 
-
-
-def diatonicVsNondiatonic(song):
-    vs = {"Diatonic": 0, "Nondiatonic": 0}
-
-    for segment in song.segments:
-        for chord in segment.chords:
-            if chord.borrowed == None:
-                vs["Diatonic"]+=1
-            else:
-                vs["Nondiatonic"]+=1
-
-
-    print(vs)
-
-#def generateGraphs():
-    #plotBarChart()
-
-def plotBarChartFromDict(dic,title,output):
-    plotBarChart(list(dic.keys()), list(dic.values()), title,output)
-
-def plotBarChart(x_data, y_data,tit,output):
-    layout_comp = go.Layout(
-        title = tit,
-        xaxis=dict(
-            title = "Chords",
-            type = "category"
-        )
-    )
-    data_comp = [go.Bar(
-            x= x_data,
-            y= y_data
-    )]
-
-    fig = go.Figure(data = data_comp, layout=layout_comp)
-    plotly.offline.plot(fig, filename=output)
-
-
-def formatDic(dic, total,disc):
-    output="["+disc+"]\n"
-    output+="##########\n"
-    first = True
-
-    for key in dic:
-        val = dic[key]
-        #rounds to two decimal places
-        ratio = (val/total)*100
-        form = "{0:.2f}".format(ratio)
-        if key != None:
-            if not first:
-                output+="\n"
-            output+=key+": "+str(val)+" ["+str(form)+"%]"
-        first = False
-
-    output+="\n##########"
-    return output
-
-#totally stoeln
-#https://stackoverflow.com/questions/3679694/a-weighted-version-of-random-choice
 def weighted_choice(choices):
+    """
+    Taks in a list of 2-tuples of the form (Item,numberOfOccurences), and
+    selects an item from the list randomly, but weighted resepect to the
+    number of occurences.
+
+    Args:
+        choices (list of 2-tuples): A list of 2-tuples to be chosen from
+
+    Returns:
+        An item from the 2-tuple, randomly chosen but weighted respect to
+        the number of times it occurs
+
+    Code from Raymond Hettinger
+    https://stackoverflow.com/a/4322940
+    """
+
     values, weights = zip(*choices)
     total = 0
     cum_weights = []
+
     for w in weights:
         total += w
         cum_weights.append(total)
+
     x = random() * total
     i = bisect(cum_weights, x)
+
     return values[i]
 
-##TODO PROBLEM WITH MODES
-def batchAnalyze(folder):
-    songs = []
-    artist = "Porter Robinson"
+def calculate_statistics(songs):
+    """
+    Calulates various statistics based on a Hooktheory corpus, and generates
+    multiple graphs and bar charts.
 
-    for filename in listdir(folder):
-        path = folder+"/"+filename
-        new_song = hkt_generator.HKTObject(path)
-        songs.append(new_song)
+    Args:
+        songs (list of HKTObject): A list HKTObjects representing the corpus
 
-    num_songs = len(songs)
-    total_distinct_chords = 0
-    rhythm_array = [0]*8
-    chord_duration_beats =[]
+    Returns:
+        Nothing
+    """
 
-    #print(hit_array)
-    for song in songs:
-        for segment in song.segments:
-            for chord in segment.chordsNoRest:
-                total_distinct_chords+=1
-                start_beat = int(((float(chord.start_beat)-1)*2))
-                rhythm_array[start_beat]+=1
-                chord_duration_beats.append(float(chord.chord_duration))
-                #print(start_beat)
-    print(rhythm_array)
-
-    prob_list = []
-    for i in range(0,len(rhythm_array)):
-        prob_list.append((i,rhythm_array[i]))
-
-    print(prob_list)
-    print(chord_duration_beats)
-
-    chord_len_mean = statistics.mean(chord_duration_beats)
-    chord_len_stdev = statistics.stdev(chord_duration_beats)
-
-    #print(weighted_choice(prob_list))
-    #rhythm_prob = list(rhythm_array)
-
-    #print(weighted_choice(rhythm_array))
-
-    #for i in range(0,len(rhythm_array)):
-        #rhythm_prob[i]=rhythm_array[i]/total_distinct_chords
-
-    #print(rhythm_prob)
-    #print(sum(rhythm_prob))
-    #print(total_distinct_chords)
-
+    #Lambda functions used to create histograms
     getChords = lambda segment: segment.chords
     getChordsNoRest = lambda segment: segment.chordsNoRest
 
@@ -169,113 +109,187 @@ def batchAnalyze(folder):
 
     getExtensions = lambda chord: chord.extension_disc
 
-    #merge sus and emb chords
     getSus = lambda chord: chord.sus
     getEmb = lambda chord: chord.emb
 
+    #Create histograms
+    full_chord_frequency = createHistogram(songs,getChordsNoRest,getRoman)
+    basic_chord_frequency = createHistogram(songs,getChordsNoRest,getRomanBasic)
+    extension_frequency = createHistogram(songs,getChordsNoRest,getExtensions)
+
+    #Merge sus and emb chords into one graph
+    sus_frequency = createHistogram(songs,getChordsNoRest,getSus)
+    emb_frequency = createHistogram(songs,getChordsNoRest,getEmb)
+
+    total_emb_frequency = emb_frequency.copy()
+    total_emb_frequency.update(sus_frequency)
+
+    #Generate graphs
+    plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
+    plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
+    plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
+    plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
 
 
-    #HOW OFTEN EACH CHORD SHOWS UP
-    #full_chord_frequency = createHistogram(songs,getChordsNoRest,getRoman)
-    #basic_chord_frequency = createHistogram(songs,getChordsNoRest,getRomanBasic)
-#    extension_frequency = createHistogram(songs,getChordsNoRest,getExtensions)
+def generate_markov_model(songs, model_state_size):
+    """
+    Generates a harmonic markov model based off of all the hooktheory songs
+    given
 
-    #sus_frequency = createHistogram(songs,getChordsNoRest,getSus)
-    #emb_frequency = createHistogram(songs,getChordsNoRest,getEmb)
+    Args:
+        songs (list of HKTObject): A list HKTObjects representing the corpus
+        model_state_size (int): The state size that should be used for the model
 
-    #total_emb_frequency = emb_frequency.copy()
-    #total_emb_frequency.update(sus_frequency)
+    Returns:
+        A markov model that represents the entire harmonic corpus given
+    """
 
-    #print(formatDic(basic_chord_frequency,total_distinct_chords, "Basic Chord Types"))
-    #print()
-    #print(formatDic(full_chord_frequency,total_distinct_chords, "Chord Types with Extensions"))
-    #print()
-    #print(formatDic(total_emb_frequency,total_distinct_chords, "Suspensions/Embellishments"))
-    #print()
-    #print(formatDic(extension_frequency,total_distinct_chords, "Extensions"))
-    #print(chord_frequency)
-    #plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic")
-    #plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full")
-    #plotBarChartFromDict(total_emb_frequency,"Embellishments","emb")
-    #plotBarChartFromDict(extension_frequency,"Just Extensions","ext")
-    #plotBarChartFromDict(total_emb_frequency)
-
-
-    #MARKOV JUNK
-    #DO THE MARKOV
     markovs = []
-    model_state_size = 1
-    print("SONGS GIVEN")
+
     for song in songs:
+        #For each song the harmonic progression is put into a string
+        #Each chord is sperated by a space
         text = ""
-        if song.mode == "1":
-            for segment in song.segments:
-                for chord in segment.chordsNoRest:
-                    #can do chord.roman or chord.roman basic
-                    text+=chord.roman_basic+" "
+        for segment in song.segments:
+            for chord in segment.chordsNoRest:
+                text+=chord.roman_basic+" "
 
+        #We create a seperate model for every song and put them into a list
+        model = markovify.Text(text,state_size=model_state_size)
+        markovs.append(model)
 
-            #print(text)
-            model = markovify.Text(text,state_size=model_state_size)
-            markovs.append(model)
-
-
-    print()
-    print("\nSONGS GENERATED\n----------")
+    #Then we combine all the models in the list
     combo = markovify.combine(markovs)
 
-    progressions_to_generate = 5
+    return combo
 
-    for i in range(progressions_to_generate):
-        print(combo.make_sentence())
 
-    print()
-    ##TODO
-    #Generating Rhythm patterns
+def generate_rhythm_pattern(rhythm_prob):
+    """
+    Generates a rhythm pattern based of the "hit-vector" given.
+
+    Args:
+        rhythm_prob (list of ints [size=8]): A list where each index contains
+            how many times a chord started on that index.
+
+    Returns:
+        An array that contains a rhythmic pattern, where 0 is no hit and 1 is
+        a hit. This array represents one segment of a song.
+    """
+    #TODO
+    #Account for time signatures other than 4/4
+    #Add ability to skip measures or add more than one hit per measures,
+    #based off of the corpus
+
+    #1 Segment = 8 measures
+    #1 Measure = 8 beats
+    #8*8=64 beats per segment
     generated_rhythm_array = [0]*64
+    #Always hit on the first beat (for now)
     generated_rhythm_array[0]=1
+
+    #Flesh out the rest based on probability
     for i in range(1,8):
-        start_beat = weighted_choice(prob_list)
+        start_beat = weighted_choice(rhythm_prob)
+        generated_rhythm_array[(i*8)+start_beat]=1
 
-        #still trying to find a good way if to skip thing
-        mult = 1
-        if random() >= 0.5:
-            mult*=-1
-        chord_len = (chord_len_mean+(random()*chord_len_stdev*2)*mult)
-        chord_len = 1
-        if chord_len > 5:
-            #skip it
-            i=i+1
-            #print("SKIP")
-        else:
-            #print(str(i)+": "+str(start_beat)+": "+str(chord_len))
+    return generated_rhythm_array
 
-            generated_rhythm_array[(i*8)+start_beat]=1
+def rhythm_pattern_to_string(rhythm_array):
+    """
+    Taks a rhythm array and converts it into a more readable format
 
-    print(generated_rhythm_array)
+    Args:
+        rhythm_array (list of ints): A list representing a rhythmic pattern,
+        1 represents a hit and 0 represents no hit
+
+    Returns:
+        A formatted string where each 8 beat measure is seperated by a barline
+    """
+    #TODO
+    #Account for time signatures other than 4/4
+    #Add ability to skip measures or add more than one hit per measures,
+    #based off of the corpus
+
     text = ""
-    for i in range(0, len(generated_rhythm_array)):
-        if i%8==0:
+    for i in range(0, len(rhythm_array)):
+        if i%8==0 and i != 0:
             text+="||"
-        text+=str(generated_rhythm_array[i])
+        text+=str(rhythm_array[i])
 
-        #print(generated_rhythm_array[i])
+    return text
 
-    #print(generated_rhythm_array)
-    print(text)
-    #print(songs)
-        #print(path)
+def get_corpus_list(folder):
+    """
+    Generates a rhythm pattern based of the "hit-vector" given.
 
-batchAnalyze("data-files/porter_robinson")
+    Args:
+        rhythm_prob (list of ints [size=8]): A list where each index contains
+            how many times a chord started on that index.
 
-#analyzeHarmony(s)
-#for key in chord_histogram:
-    #print(key)
+    Returns:
+        An array that contains a rhythmic pattern, where 0 is no hit and 1 is
+        a hit. This array represents one segment of a song.
+    """
+    songs = []
 
-        #print(chord.roman)
+    for filename in listdir(folder):
+        path = folder+"/"+filename
+        new_song = hkt_generator.HKTObject(path)
+        songs.append(new_song)
 
-#for key in chord_histogram:
+    return songs
 
-    #print(key)
-##TODO
-#Bass movement?
+
+class HarmonicAnalysis:
+    """
+    A handy object that will take in a folder to a corpus of .hkt files,
+    and provide useful stastics for the harmony, a harmonic markov model,
+    and a harmonic rhythm generator.
+
+	Args:
+		songs (listof HKTObjects): A list containing HKTObjects, representing
+            the corpus
+        markov_model (markov_model): A model for the harmonies in the corpus
+        rhythm_array (listof int): A tally array cotaining how many times a
+            chord hits on the beat given the index of the beat
+        prob_tuple_list (listof 2-tuples): Used to generate a weighted
+            probability rhythm vector
+    """
+    def __init__(self, filepath):
+        self.songs = get_corpus_list(filepath)
+        self.markov_model = generate_markov_model(self.songs,1)
+        self.rhythm_array = self.rhythm_analysis()
+        self.prob_tuple_list = self.generate_rhythm_tuple()
+
+        #TODO
+        #Implement
+        self.chord_duration_average = 0
+        self.chord_duration_stdev = 0
+
+    def generate_progression(self):
+        return self.markov_model.make_sentence()
+
+    def generate_rhythm_vector(self):
+        pattern = generate_rhythm_pattern(self.prob_tuple_list)
+        return rhythm_pattern_to_string(pattern)
+
+
+    def rhythm_analysis(self):
+        rhythm_array = [0]*8
+
+        for song in self.songs:
+            for segment in song.segments:
+                for chord in segment.chordsNoRest:
+                    start_beat = int(((float(chord.start_beat)-1)*2))
+                    rhythm_array[start_beat]+=1
+
+        return rhythm_array
+
+    def generate_rhythm_tuple(self):
+        prob_list = []
+
+        for i in range(0,len(self.rhythm_array)):
+            prob_list.append((i,self.rhythm_array[i]))
+
+        return prob_list

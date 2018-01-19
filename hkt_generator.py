@@ -143,7 +143,6 @@ class HKTObject:
 				else:
 					chord.roman = "REST"
 
-		#Populate no rest arr
 
 def createSegment(segmentDom):
 	segment = Segment()
