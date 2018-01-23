@@ -164,7 +164,7 @@ def generate_markov_model(songs, model_state_size):
     return combo
 
 
-def generate_rhythm_pattern(rhythm_prob):
+def generate_rhythm_pattern(rhythm_prob, chords_per_measure):
     """
     Generates a rhythm pattern based of the "hit-vector" given.
 
@@ -184,14 +184,31 @@ def generate_rhythm_pattern(rhythm_prob):
     #1 Segment = 8 measures
     #1 Measure = 8 beats
     #8*8=64 beats per segment
-    generated_rhythm_array = [0]*64
+    beats_per_segment = 64
+    generated_rhythm_array = [0]*beats_per_segment
     #Always hit on the first beat (for now)
     generated_rhythm_array[0]=1
 
+
     #Flesh out the rest based on probability
-    for i in range(1,8):
-        start_beat = weighted_choice(rhythm_prob)
-        generated_rhythm_array[(i*8)+start_beat]=1
+    for i in range(0,8):
+        rhythm_copy = list(rhythm_prob)
+        chords_this_measure = weighted_choice(chords_per_measure)
+
+        #Generate how ever many chords we have to
+        for j in range(0, chords_this_measure):
+            #Figure out what beat to place them on
+            start_beat = weighted_choice(rhythm_copy)
+            beat_to_place = (i*8)+start_beat
+
+            #shouldn't be greater than 64
+            if beat_to_place < 64:
+                generated_rhythm_array[beat_to_place]=1
+                #When a beat is placed, set it's probability to zero
+                #So we don't place it again
+                rhythm_copy[start_beat] = (start_beat,0)
+            else:
+                print("Beat greater than 64!")
 
     return generated_rhythm_array
 
@@ -256,11 +273,14 @@ class HarmonicAnalysis:
         prob_tuple_list (listof 2-tuples): Used to generate a weighted
             probability rhythm vector
     """
-    def __init__(self, filepath):
+    def __init__(self, filepath, state_size):
         self.songs = get_corpus_list(filepath)
-        self.markov_model = generate_markov_model(self.songs,1)
+        self.markov_model = generate_markov_model(self.songs,state_size)
         self.rhythm_array = self.rhythm_analysis()
-        self.prob_tuple_list = self.generate_rhythm_tuple()
+        self.prob_tuple_list = self.generate_rhythm_tuple(self.rhythm_array)
+
+        self.chords_per_measure = self.generate_chords_per_measure()
+        self.chords_per_measure_tuple = self.generate_rhythm_tuple(self.chords_per_measure)
 
         #TODO
         #Implement
@@ -270,8 +290,46 @@ class HarmonicAnalysis:
     def generate_progression(self):
         return self.markov_model.make_sentence()
 
+    #Makes a general histogram of how many chords per measure the corpus has
+    #chord_array[0] = number of times chords last longer than 1 measure
+    #chord_array[1] = number of times there is one chord per measure
+    #chord_array[2] = number of times there is two chords per measure
+    #etc
+    def generate_chords_per_measure(self):
+        #A tally array
+        chord_array = [0]*8
+
+        for song in self.songs:
+            for segment in song.segments:
+                #We need at least two chordal data points
+                if len(segment.chordsNoRest) > 0:
+
+                    last_chord_start_measure = segment.chordsNoRest[0].start_measure
+                    tally = 1
+
+                    for i in range(1, len(segment.chordsNoRest)):
+                        #If the difference in measures between sucesssive chords is >1, that means that
+                        #there is a chord longer than one measure between them
+                        if int(segment.chordsNoRest[i].start_measure)-int(last_chord_start_measure) > 1:
+                            chord_array[0]+=1
+
+                        #Tally chords that have the same start measure
+                        if segment.chordsNoRest[i].start_measure == last_chord_start_measure:
+                            tally+=1
+                        else:
+                            #Increment and reset the tally once a new measure starts
+                            chord_array[tally]+=1
+                            tally = 1
+
+                        last_chord_start_measure = segment.chordsNoRest[i].start_measure
+
+                    chord_array[tally]+=1
+
+        return chord_array
+
+
     def generate_rhythm_vector(self):
-        pattern = generate_rhythm_pattern(self.prob_tuple_list)
+        pattern = generate_rhythm_pattern(self.prob_tuple_list, self.chords_per_measure_tuple)
         return rhythm_pattern_to_string(pattern)
 
 
@@ -282,14 +340,19 @@ class HarmonicAnalysis:
             for segment in song.segments:
                 for chord in segment.chordsNoRest:
                     start_beat = int(((float(chord.start_beat)-1)*2))
-                    rhythm_array[start_beat]+=1
+
+                    #Make sure it doesn't break with greater than 4/4
+                    if start_beat < 8:
+                        rhythm_array[start_beat]+=1
+                    else:
+                        print("Greater than 4/4!")
 
         return rhythm_array
 
-    def generate_rhythm_tuple(self):
+    def generate_rhythm_tuple(self, array):
         prob_list = []
 
-        for i in range(0,len(self.rhythm_array)):
-            prob_list.append((i,self.rhythm_array[i]))
+        for i in range(0,len(array)):
+            prob_list.append((i,array[i]))
 
         return prob_list
