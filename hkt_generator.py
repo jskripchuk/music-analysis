@@ -94,10 +94,15 @@ class Segment:
 	def __init__(self):
 		self.melody = []
 		self.chords = []
+		self.melodyNoRest = []
 		self.chordsNoRest = []
 
 	def addNote(self,note):
 		self.melody.append(note)
+
+	def addNoteNoRest(self,note):
+		if note.isRest == "0":
+			self.melodyNoRest.append(note)
 
 	def addChord(self, chord):
 		self.chords.append(chord)
@@ -134,6 +139,7 @@ class HKTObject:
 		for segment in DOMTree.getElementsByTagName("segment"):
 			self.segments.append(createSegment(segment))
 
+		#print(self.title)
 		for segment in self.segments:
 			for chord in segment.chords:
 				chord.extension_disc = ""
@@ -148,6 +154,7 @@ def createSegment(segmentDom):
 	segment = Segment()
 	for note in segmentDom.getElementsByTagName("note"):
 		segment.addNote(createNote(note))
+		segment.addNoteNoRest(createNote(note))
 
 	for chord in segmentDom.getElementsByTagName("chord"):
 		segment.addChord(createChord(chord))

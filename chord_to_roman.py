@@ -111,36 +111,41 @@ def handleBorrowedChord(chord,current_mode,current_mode_num):
 
     #We add +5 to chord.borrowed since it is in the range [-5,1]
     #We need [0,6] for our array
-    borrowFrom = mode_int_flat_order[int(chord.borrowed)+5]
-    borrowTo = mode_int_scale_order[current_mode_num]
-    sd = int(chord.scale_degree)-1
-    difference = borrowFrom[sd]-borrowTo[sd]
+    #print(chord.borrowed)
+    if(int(chord.borrowed)+5 < len(mode_int_flat_order)):
+        borrowFrom = mode_int_flat_order[int(chord.borrowed)+5]
+        borrowTo = mode_int_scale_order[current_mode_num]
+        sd = int(chord.scale_degree)-1
+        difference = borrowFrom[sd]-borrowTo[sd]
 
     #If the difference is positive, we need to sharpen the note
     #If the difference is negative, we need to flatten it
     #Else we have no accidental
-    if difference > 0:
-        accidental = "#"
-    elif difference < 0:
-        accidental = "b"
+        if difference > 0:
+            accidental = "#"
+        elif difference < 0:
+            accidental = "b"
 
     #Our base roman numeral is the chord from the mode we borrow from
-    roman = modes_flat_order[int(chord.borrowed)+5][sd]
+        roman = modes_flat_order[int(chord.borrowed)+5][sd]
 
     #A quick and dirty index map from the scale order to the flat order array
     #Used to alculate the correct quality of the chord extension
-    swap = [6,2,5,1,4,0,3]
-    borrowNum = swap[int(chord.borrowed)+5]
-    index = (borrowNum+sd)%7
+        swap = [6,2,5,1,4,0,3]
+        borrowNum = swap[int(chord.borrowed)+5]
+        index = (borrowNum+sd)%7
 
-    ext = getExtensionSymbol(chord,index)
-    emb = getEmbellishment(chord)
+        ext = getExtensionSymbol(chord,index)
+        emb = getEmbellishment(chord)
 
-    chord.extension_disc = ext
-    chord.roman_basic = accidental+roman
-    chord.accidental = accidental
+        chord.extension_disc = ext
+        chord.roman_basic = accidental+roman
+        chord.accidental = accidental
 
-    return accidental+roman+ext+emb
+        return accidental+roman+ext+emb
+    else:
+        print("BAD CHORD")
+        return ""
 
 def getEmbellishment(chord):
     """

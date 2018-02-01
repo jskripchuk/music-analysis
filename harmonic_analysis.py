@@ -2,6 +2,7 @@ import hkt_generator
 import statistics
 import markovify
 import graphing
+import tools
 from random import random
 from bisect import bisect
 from os import listdir
@@ -15,78 +16,6 @@ progression and rhythm.
 
 """
 
-def createHistogram(songs, segFunc, varFunc):
-    """
-    Taks in a list of songs, and creates a histogram (dictionary)
-    based on the qualities desired with the lambda functions segFunc and varFunc.
-
-    Args:
-        songs (list of HKTObject): A list of all songs to be analyzed
-        segFunc (lambda): A function that returns the part of a segment
-            in HKTObject. (Either the chords or the melody)
-        varFunc (lambda): A function that returns the quality of the item that
-            we wish to make a histogram out of.
-            (Eg. Roman Numeral, seventh quality, suspension...)
-
-    Returns:
-        A dictionary that contains a tally of how many times a certain quality
-        occurs in the specified part of the segment. For example:
-
-        Progression: I-IV-I-V
-        hist["I"] = 2
-        hist["IV"] = 1
-        hist["V"] = 1
-    """
-
-    histogram = dict()
-
-    for song in songs:
-        for segment in song.segments:
-            for obj in segFunc(segment):
-                inHisto = False
-
-                #If it is in the histogram, then increment the tally
-                for key in histogram:
-                    if varFunc(obj) == key:
-                        histogram[key]+=1
-                        inHisto = True
-                        break
-
-                #If it is not in the histogram, then add it and tally it
-                if not inHisto:
-                    histogram[varFunc(obj)] = 1
-
-    return histogram
-
-def weighted_choice(choices):
-    """
-    Taks in a list of 2-tuples of the form (Item,numberOfOccurences), and
-    selects an item from the list randomly, but weighted resepect to the
-    number of occurences.
-
-    Args:
-        choices (list of 2-tuples): A list of 2-tuples to be chosen from
-
-    Returns:
-        An item from the 2-tuple, randomly chosen but weighted respect to
-        the number of times it occurs
-
-    Code from Raymond Hettinger
-    https://stackoverflow.com/a/4322940
-    """
-
-    values, weights = zip(*choices)
-    total = 0
-    cum_weights = []
-
-    for w in weights:
-        total += w
-        cum_weights.append(total)
-
-    x = random() * total
-    i = bisect(cum_weights, x)
-
-    return values[i]
 
 def calculate_statistics(songs):
     """
@@ -113,13 +42,13 @@ def calculate_statistics(songs):
     getEmb = lambda chord: chord.emb
 
     #Create histograms
-    full_chord_frequency = createHistogram(songs,getChordsNoRest,getRoman)
-    basic_chord_frequency = createHistogram(songs,getChordsNoRest,getRomanBasic)
-    extension_frequency = createHistogram(songs,getChordsNoRest,getExtensions)
+    full_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRoman)
+    basic_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRomanBasic)
+    extension_frequency = tools.createHistogram(songs,getChordsNoRest,getExtensions)
 
     #Merge sus and emb chords into one graph
-    sus_frequency = createHistogram(songs,getChordsNoRest,getSus)
-    emb_frequency = createHistogram(songs,getChordsNoRest,getEmb)
+    sus_frequency = tools.createHistogram(songs,getChordsNoRest,getSus)
+    emb_frequency = tools.createHistogram(songs,getChordsNoRest,getEmb)
 
     total_emb_frequency = emb_frequency.copy()
     total_emb_frequency.update(sus_frequency)
@@ -193,12 +122,12 @@ def generate_rhythm_pattern(rhythm_prob, chords_per_measure):
     #Flesh out the rest based on probability
     for i in range(0,8):
         rhythm_copy = list(rhythm_prob)
-        chords_this_measure = weighted_choice(chords_per_measure)
+        chords_this_measure = tools.weighted_choice(chords_per_measure)
 
         #Generate how ever many chords we have to
         for j in range(0, chords_this_measure):
             #Figure out what beat to place them on
-            start_beat = weighted_choice(rhythm_copy)
+            start_beat = tools.weighted_choice(rhythm_copy)
             beat_to_place = (i*8)+start_beat
 
             #shouldn't be greater than 64
@@ -236,27 +165,6 @@ def rhythm_pattern_to_string(rhythm_array):
 
     return text
 
-def get_corpus_list(folder):
-    """
-    Generates a rhythm pattern based of the "hit-vector" given.
-
-    Args:
-        rhythm_prob (list of ints [size=8]): A list where each index contains
-            how many times a chord started on that index.
-
-    Returns:
-        An array that contains a rhythmic pattern, where 0 is no hit and 1 is
-        a hit. This array represents one segment of a song.
-    """
-    songs = []
-
-    for filename in listdir(folder):
-        path = folder+"/"+filename
-        new_song = hkt_generator.HKTObject(path)
-        songs.append(new_song)
-
-    return songs
-
 
 class HarmonicAnalysis:
     """
@@ -273,8 +181,9 @@ class HarmonicAnalysis:
         prob_tuple_list (listof 2-tuples): Used to generate a weighted
             probability rhythm vector
     """
-    def __init__(self, filepath, state_size):
-        self.songs = get_corpus_list(filepath)
+    def __init__(self, songs, state_size):
+        #self.songs = tools.get_corpus_list(filepath)
+        self.songs = songs
         self.markov_model = generate_markov_model(self.songs,state_size)
         self.rhythm_array = self.rhythm_analysis()
         self.prob_tuple_list = self.generate_rhythm_tuple(self.rhythm_array)
