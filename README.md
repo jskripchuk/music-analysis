@@ -15,6 +15,8 @@ One of the main goals we had in mind was for the Toolkit to be friendly to begin
 * Graphing functionality using Plotly
 
 # How to Use
+Requires [Markovify](https://github.com/jsvine/markovify) and [Plotly](https://github.com/plotly/plotly.py), so please install those packages first.
+
 ```python
 import analysis_model as analysis
 
