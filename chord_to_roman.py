@@ -144,7 +144,9 @@ def handleBorrowedChord(chord,current_mode,current_mode_num):
 
         return accidental+roman+ext+emb
     else:
-        print("BAD CHORD")
+        #Hooktheory breaks when you go up the circle fifths
+        #TODO: Fix this, but I will never fix this
+        #print("BAD CHORD")
         return ""
 
 def getEmbellishment(chord):

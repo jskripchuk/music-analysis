@@ -11,3 +11,12 @@ class CorpusAnalysis:
 
     def generate_progression(self):
         return self.harmonic_model.markov_model.make_sentence()
+
+    def generate_melodic_sequence(self):
+        return self.melody_model.markov_model.make_sentence()
+
+    def generate_harmonic_rhythm(self):
+        return self.harmonic_model.generate_rhythm_vector()
+
+    def calculate_statistics(self):
+        return self.harmonic_model.get_statistics()

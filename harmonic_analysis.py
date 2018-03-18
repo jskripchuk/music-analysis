@@ -54,10 +54,10 @@ def calculate_statistics(songs):
     total_emb_frequency.update(sus_frequency)
 
     #Generate graphs
-    plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
-    plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
-    plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
-    plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
+    graphing.plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
+    graphing.plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
+    graphing.plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
+    graphing.plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
 
 
 def generate_markov_model(songs, model_state_size):
@@ -198,6 +198,9 @@ class HarmonicAnalysis:
 
     def generate_progression(self):
         return self.markov_model.make_sentence()
+
+    def get_statistics(self):
+        return calculate_statistics(self.songs)
 
     #Makes a general histogram of how many chords per measure the corpus has
     #chord_array[0] = number of times chords last longer than 1 measure
