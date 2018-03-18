@@ -6,7 +6,23 @@ The main motivation for HoLST was the creation of a new course at the University
 
 As we quickly learned (as of date), Hooktheory's own API is seriously lacking in utility. It does not support the ability to search by artist, by song name, by key or mode, etc. The only tool provided is to search for songs with the same progression (and analysis of the entire Hooktheory corpus has been done many times before). This meant that our users had to download the .hkt files themselves, which unfortunately requires a Hooktheory Plus membership.
 
-One of the main goals we had in mind was for the Toolkit to be friendly to beginning programmers, since this is who the course was marketed towards.
+One of the main goals we had in mind was for the Toolkit to be friendly to beginning programmers, since the function of the course was to introduce students to the main concepts of programming and Computer Science through the lens of music theory.
 
 # Features
+* Parses .hkt files and encapsulates the XML parameters into Objects
+* Statistical analysis of the corpus, such as melody, harmony, and rhythm
+* Statistically influenced generation of harmonic progressions, melodic figures, and rhythm vectors
+* Graphing functionality using Plotly
 
+# How to Use
+Requires [Markovify](https://github.com/jsvine/markovify) and [Plotly](https://github.com/plotly/plotly.py), so please install those packages first.
+
+```python
+import analysis_model as analysis
+
+obj = analysis.CorpusAnalysis("path/to/corpus/folder")
+print(obj.generate_progression())
+```
+# Issues
+* Currently the model works best in 4/4, detailed support for other time signatures will be avalible in the future
+* Due to Hooktheory's questionable method of handling borrowed chords, in rare cases the algorithm will be unable to identify a chord if the mode is changed from the the song's original
