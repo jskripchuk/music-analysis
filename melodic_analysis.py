@@ -20,8 +20,12 @@ def generate_markov_model(songs, model_state_size):
                 text+=note.scale_degree+" "
 
         #We create a seperate model for every song and put them into a list
-        model = markovify.Text(text,state_size=model_state_size)
-        markovs.append(model)
+
+        #print(text)
+        #text="A B C D E F G\n C D E F G E A G \n \n"
+        if text != '':
+            model = markovify.Text(text,state_size=model_state_size)
+            markovs.append(model)
 
     #Then we combine all the models in the list
     combo = markovify.combine(markovs)

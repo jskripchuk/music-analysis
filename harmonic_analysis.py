@@ -84,8 +84,9 @@ def generate_markov_model(songs, model_state_size):
                 text+=chord.roman_basic+" "
 
         #We create a seperate model for every song and put them into a list
-        model = markovify.Text(text,state_size=model_state_size)
-        markovs.append(model)
+        if text != '':
+            model = markovify.Text(text,state_size=model_state_size)
+            markovs.append(model)
 
     #Then we combine all the models in the list
     combo = markovify.combine(markovs)
