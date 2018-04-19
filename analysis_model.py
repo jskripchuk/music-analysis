@@ -25,4 +25,4 @@ class CorpusAnalysis:
         return self.harmonic_model.get_statistics()
 
     def get_solfege_histogram(self):
-        melody_model.generate_solfege_histogram()
+        self.melody_model.get_histogram()
