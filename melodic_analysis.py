@@ -1,6 +1,6 @@
 import hkt_generator
-import statistics
 import markovify
+import statistics
 import graphing
 import tools
 from random import random
@@ -126,3 +126,9 @@ class MelodicAnalysis:
 
     def generate_line(self):
         return self.markov_model.make_sentence()
+
+    def generate_solfege_histogram(self):
+        self.generate_solfege_histogram(self.songs)
+
+    def get_gestures_in_corpus(self):
+        return self.gestures_in_corpus
