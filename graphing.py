@@ -8,7 +8,7 @@ def plotBarChart(x_data, y_data,tit,output):
     layout_comp = go.Layout(
         title = tit,
         xaxis=dict(
-            title = "Chords",
+            title = "Scale Degrees",
             type = "category"
         )
     )
