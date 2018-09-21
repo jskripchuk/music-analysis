@@ -1,4 +1,6 @@
 import chord_to_roman
+import json
+import codecs
 
 from xml.dom.minidom import parse
 import xml.dom.minidom
@@ -51,7 +53,7 @@ class Chord:
 
 	def __init__(self, scale_degree, fb, sec, sus, pedal, alternate,
 				borrowed, chord_duration, start_measure, start_beat,
-				start_beat_abs, isRest,emb):
+				start_beat_abs, isRest,emb, adds):
 		self.scale_degree = scale_degree
 		self.fb = fb
 		self.sec = sec
@@ -69,6 +71,7 @@ class Chord:
 		self.roman_basic = ""
 		self.extension_disc = ""
 		self.accidental = ""
+		self.adds = adds
 
 def createChord(chordDom):
 	scale_degree = getData(chordDom, "sd")
@@ -90,6 +93,29 @@ def createChord(chordDom):
 
 	return chord
 
+##IMPLEMENT
+#FINIHSL ATER
+def createChordJSON(chordJSON):
+	scale_degree = chordJSON["root"]
+	fb = chordJSON["inversion"]
+	sus = chordJSON["suspensions"]
+	sec = chordJSON["applied"]
+	pedal = chordJSON["pedal"]
+	alternate = chordJSON["alternate"]
+	borrowed = chordJSON["borrowed"]
+	chord_duration = chordJSON["duration"]
+	start_measure = chordJSON["beat"]
+	start_beat = chordJSON["beat"]
+	start_beat_abs = chordJSON["beat"]
+	isRest = chordJSON["isRest"]
+	emb = chordJSON["adds"]
+	adds = chordJSON["adds"]
+
+	chord = Chord(scale_degree, fb, sec, sus, pedal, alternate, borrowed,
+		chord_duration, start_measure, start_beat, start_beat_abs, isRest,emb, adds)
+
+	return chord
+
 class Segment:
 	def __init__(self):
 		self.melody = []
@@ -101,7 +127,7 @@ class Segment:
 		self.melody.append(note)
 
 	def addNoteNoRest(self,note):
-		if note.isRest == "0":
+		if note.isRest == "0" or note.isRest == False:
 			self.melodyNoRest.append(note)
 
 	def addChord(self, chord):
@@ -125,29 +151,54 @@ class Segment:
 class HKTObject:
 	def __init__(self, filepath):
 
-		DOMTree = xml.dom.minidom.parse(filepath)
-		collection = DOMTree.documentElement
-
+		JSON = True
 		self.segments = []
-		self.artist = getData(collection, "artist")
-		self.title = getData(collection, "title")
-		self.bpm = getData(collection, "BPM")
-		self.key = getData(collection, "key")
-		self.mode = getData(collection, "mode")
-		self.youtubeID = getData(collection, "YouTubeID")
 
-		for segment in DOMTree.getElementsByTagName("segment"):
-			self.segments.append(createSegment(segment))
 
-		#print(self.title)
-		for segment in self.segments:
-			for chord in segment.chords:
-				chord.extension_disc = ""
-				if chord.isRest == "0":
-					chord.roman = chord_to_roman.parseChord(chord,self.mode)
+		if JSON:
+			song = json.load(codecs.open(filepath,'r','utf-8-sig'))
+			#print(song)
+			self.artist = None
+			self.title = None
+			self.bpm = song["tempos"][0]["bpm"]
+			self.key = song["keys"][0]["tonic"]
+			self.mode = song["keys"][0]["scale"]
+			self.youtubeID = song["youtube"]["id"]
+
+			
+
+			self.segments.append(createSegmentJSON(song))
+
+			for segment in self.segments:
+				for chord in segment.chords:
+					chord.roman = chord_to_roman.parseChord(chord, self.mode)
 					segment.addChordNoRest(chord)
-				else:
-					chord.roman = "REST"
+					#print(chord.roman)
+
+		else:
+			DOMTree = xml.dom.minidom.parse(filepath)
+			collection = DOMTree.documentElement
+
+			self.artist = getData(collection, "artist")
+			self.title = getData(collection, "title")
+			self.bpm = getData(collection, "BPM")
+			self.key = getData(collection, "key")
+			self.mode = getData(collection, "mode")
+			self.youtubeID = getData(collection, "YouTubeID")
+
+			for segment in DOMTree.getElementsByTagName("segment"):
+				self.segments.append(createSegment(segment))
+
+		
+		#print(self.title)
+		#for segment in self.segments:
+		#	for chord in segment.chords:
+		#		chord.extension_disc = ""
+		#		if chord.isRest == "0":
+		#			chord.roman = chord_to_roman.parseChord(chord,self.mode)
+		#			segment.addChordNoRest(chord)
+		#		else:
+		#			chord.roman = "REST"
 
 
 def createSegment(segmentDom):
@@ -158,6 +209,19 @@ def createSegment(segmentDom):
 
 	for chord in segmentDom.getElementsByTagName("chord"):
 		segment.addChord(createChord(chord))
+
+	return segment
+
+##IMPLEMENT
+def createSegmentJSON(segmentJSON):
+	segment = Segment()
+	for note in segmentJSON["notes"]:
+		segment.addNote(createNoteJSON(note))
+		segment.addNoteNoRest(createNoteJSON(note))
+
+	for chord in segmentJSON["chords"]:
+		segment.addChord(createChordJSON(chord))
+		#segment.addChordNoRest(createChordJSON(chord))
 
 	return segment
 
@@ -173,6 +237,21 @@ def createNote(noteDom):
 			scale_degree, octave, isRest)
 
 	return note
+
+##IMPLEMENT
+def createNoteJSON(noteJSON):
+	start_beat_abs = noteJSON["beat"]
+	start_measure = noteJSON["beat"]
+	note_length = noteJSON["duration"]
+	scale_degree = noteJSON["sd"]
+	octave = noteJSON["octave"]
+	isRest = noteJSON["isRest"]
+
+	note = Note(start_beat_abs, start_measure, note_length,
+			scale_degree, octave, isRest)
+
+	return note
+
 
 
 def getData(dom, tag):

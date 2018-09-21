@@ -80,15 +80,21 @@ def generate_markov_model(songs, model_state_size):
         #Each chord is sperated by a space
         text = ""
         for segment in song.segments:
+            #print(segment)
             for chord in segment.chordsNoRest:
+                #print(chord)
                 text+=chord.roman_basic+" "
+                #print(chord.roman_basic)
 
         #We create a seperate model for every song and put them into a list
         if text != '':
+            #print(text)
             model = markovify.Text(text,state_size=model_state_size)
             markovs.append(model)
 
     #Then we combine all the models in the list
+
+    #print(markovs)
     combo = markovify.combine(markovs)
 
     return combo
