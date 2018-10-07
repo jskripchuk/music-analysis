@@ -1,4 +1,4 @@
-import chord_to_roman
+import json_chord_to_roman
 import json
 import codecs
 
@@ -171,7 +171,7 @@ class HKTObject:
 
 			for segment in self.segments:
 				for chord in segment.chords:
-					chord.roman = chord_to_roman.parseChord(chord, self.mode)
+					chord.roman = json_chord_to_roman.parseChord(chord, self.mode)
 					segment.addChordNoRest(chord)
 					#print(chord.roman)
 
