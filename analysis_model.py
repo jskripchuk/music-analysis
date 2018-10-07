@@ -8,6 +8,16 @@ class CorpusAnalysis:
         #self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1,gesture_rest)
         #self.harmonic_model = harmonic_analysis.HarmonicAnalysis(self.songs,1)
 
+    def print_songs(self):
+        for song in self.songs:
+            print(song.title)
+            for segment in song.segments:
+                print("##########")
+                for chord in segment.chords:
+                    print(chord.roman)
+					#chord.roman = json_chord_to_roman.parseChord(chord, self.mode)
+					#segment.addChordNoRest(chord)
+                print("###########")
 
     def generate_progression(self):
         return self.harmonic_model.markov_model.make_sentence()

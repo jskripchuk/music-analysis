@@ -101,7 +101,7 @@ def createChordJSON(chordJSON):
 	sus = chordJSON["suspensions"]
 	sec = chordJSON["applied"]
 	pedal = chordJSON["pedal"]
-	alternate = chordJSON["alternate"]
+	alternate = chordJSON["alterations"]
 	borrowed = chordJSON["borrowed"]
 	chord_duration = chordJSON["duration"]
 	start_measure = chordJSON["beat"]
@@ -159,7 +159,7 @@ class HKTObject:
 			song = json.load(codecs.open(filepath,'r','utf-8-sig'))
 			#print(song)
 			self.artist = None
-			self.title = None
+			self.title = filepath
 			self.bpm = song["tempos"][0]["bpm"]
 			self.key = song["keys"][0]["tonic"]
 			self.mode = song["keys"][0]["scale"]

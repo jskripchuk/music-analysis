@@ -1,3 +1,5 @@
+import functools
+
 #The chord functions of the basic diatonic modes
 major = ["I","ii","iii","IV","V","vi","viio"]
 dorian = ["i","ii","III","IV","v","vio","VII"]
@@ -78,12 +80,10 @@ def handleBorrowed(chord, mode):
 
     roman = accidental+mode_dic_to_roman[chord.borrowed][sd-1]
     chord_type = getChordType(chord, chord.borrowed)
-        
+
+
+    return roman+chord_type+getEmbellishments(chord)
     
-    #print(roman+chord_type)
-
-    return roman+chord_type
-
 def getChordType(chord, mode):
     sd = chord.scale_degree
     arr_loc = (mode_offsets[mode]+(sd-1))%len(seventh_qualities)
@@ -98,11 +98,90 @@ def getChordType(chord, mode):
     else:
         return ""
 
+def getAlterations(chord):
+    result = ""
+    for i in chord.alternate:
+        result+=i
 
-def getAccidental(chord, mode):
-    return ""
+    return result
+
+def getSuspensions(chord):
+    result = ""
+
+    for i in chord.sus:
+        result+="sus"+str(i)
+    
+    return result
+
+def getAdds(chord):
+    result = ""
+
+    for i in chord.adds:
+        result+="add"+str(i)
+    
+    return result
+
+def getEmbellishments(chord):
+    suspensions = getSuspensions(chord)
+    alterations = getAlterations(chord)
+    adds = getAdds(chord)
+
+    return suspensions+alterations+adds
+
+def handleApplied(chord,mode):
+    roman = ""
+
+    if chord.sec == 5:
+        roman = "V"
+    elif chord.sec == 4:
+        roman = "IV"
+    elif chord.sec == 7:
+        roman = "viio"
+
+    if chord.emb == 11:
+        roman+="11"
+    elif chord.emb == 13:
+        roman+="13"
+    elif chord.emb == 7:
+        roman+= seventh_qualities[chord.sec-1]
+    elif chord.emb == 9:
+        roman+= ninth_qualities[chord.sec-1]
+
+
+    roman+=getEmbellishments(chord)
+
+    roman+="/"+mode_dic_to_roman[mode][chord.scale_degree-1]
+
+    return roman
+
+
 
 def parseChord(chord, mode):
+    try:
+        roman = ""
+        if chord.borrowed != "" and chord.borrowed != None:
+            roman = handleBorrowed(chord, mode)
+        elif chord.sec != 0:
+            roman = handleApplied(chord,mode)
+        else:
+            roman = mode_dic_to_roman[mode][chord.scale_degree-1]
+            roman+=getChordType(chord,mode)
+            roman+=getEmbellishments(chord)
+
+        chord.roman = roman
+        return roman
+    except:
+        chord.roman = ""
+        print("skipping chord..")
+        return ""
+
+    #suspensions = getSuspensions(chord)
+    #alterations = getAlterations(chord)
+
+    #full_roman = roman+suspensions+alterations
+
     
-    if chord.borrowed != "":
-        handleBorrowed(chord, mode)
+
+    #print(roman)
+    #return roman
+    

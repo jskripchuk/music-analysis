@@ -4,7 +4,7 @@ import os
 #os.chdir("C:\\Users\\Jimmy\\Documents\\GitHub\\music-analysis")
 print(os.getcwd())
 
-filepath = os.getcwd()+"/test"
+filepath = os.getcwd()+"/adele"
 
 #obj = g.HKTObject(filepath)
 
@@ -12,6 +12,7 @@ filepath = os.getcwd()+"/test"
 #mem = analysis.HarmonicAnalysis()
 #print(obj.segments[0].chords[0])
 obj = analysis.CorpusAnalysis(filepath,1)
+#obj.print_songs()
 #obj = analysis.MelodicAnalysis("data-files/adele_example/HKT_files_chorus",1,0.5)
 #print(obj.generate_line())
 #print(obj.generate_progression())
