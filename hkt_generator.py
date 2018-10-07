@@ -108,7 +108,7 @@ def createChordJSON(chordJSON):
 	start_beat = chordJSON["beat"]
 	start_beat_abs = chordJSON["beat"]
 	isRest = chordJSON["isRest"]
-	emb = chordJSON["adds"]
+	emb = chordJSON["type"]
 	adds = chordJSON["adds"]
 
 	chord = Chord(scale_degree, fb, sec, sus, pedal, alternate, borrowed,

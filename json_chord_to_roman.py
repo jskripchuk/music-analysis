@@ -19,6 +19,8 @@ loc_int =[0,-1,-1,0,-1,-1,-1]
 
 mode_dic_to_flats = {"major": major_int, "dorian": dorian_int, "phyrigan": phryg_int, "lydian": lyd_int, "mixolydian": mixo_int, "minor": minor_int, "locrian": loc_int}
 mode_dic_to_roman = {"major": major, "dorian": dorian, "phyrgian": phrygian, "lydian": lydian, "mixolydian": mixolydian, "minor": minor, "locrian": locrian}
+mode_offsets = {"major": 0, "dorian": 1, "phyrgian": 2, "lydian": 3, "mixolydian": 4, "minor": 5, "locrian":6}
+
 #Extension qualities that are not represented in HKT files
 #Sevenths
 maj7="maj7"
@@ -75,14 +77,27 @@ def handleBorrowed(chord, mode):
         accidental="b"
 
     roman = accidental+mode_dic_to_roman[chord.borrowed][sd-1]
-    chord_type = ""
+    chord_type = getChordType(chord, chord.borrowed)
+        
     
-    if chord.type != 5:
+    #print(roman+chord_type)
 
-    
-    print(result)
+    return roman+chord_type
 
-    return ""
+def getChordType(chord, mode):
+    sd = chord.scale_degree
+    arr_loc = (mode_offsets[mode]+(sd-1))%len(seventh_qualities)
+    if chord.emb == 11:
+        return eleventh
+    elif chord.emb == 13:
+        return thirteen
+    elif chord.emb == 7:
+        return seventh_qualities[arr_loc]
+    elif chord.emb == 9:
+        return ninth_qualities[arr_loc]
+    else:
+        return ""
+
 
 def getAccidental(chord, mode):
     return ""
