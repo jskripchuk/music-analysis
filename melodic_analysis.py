@@ -36,13 +36,16 @@ def generate_markov_model(songs, model_state_size):
 #Problemo
 #Gestures that are over the barline
 
+
+#Gestures now take it in terms of beats
+#16 beats in 4 bars
 def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
     number_of_gestures = 0
 
     #Used to make sure we don't include a rest at the beginning as a gesture
     first_note = True
     for note in segment.melody:
-        if (note.scale_degree == "rest"
+        if (note.isRest
             and float(note.note_length) > gesture_rest_cutoff
             and not first_note):
             #print(note.note_length)
@@ -58,7 +61,7 @@ def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
         #print(note.start_measure+": "+note.scale_degree)
 
     if len(segment.melody) != 0 and stop == 8:
-        if segment.melody[len(segment.melody)-1].scale_degree != "rest":
+        if segment.melody[len(segment.melody)-1].isRest:
             number_of_gestures+=1
 
     return number_of_gestures

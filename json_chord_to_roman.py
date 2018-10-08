@@ -79,6 +79,7 @@ def handleBorrowed(chord, mode):
         accidental="b"
 
     roman = accidental+mode_dic_to_roman[chord.borrowed][sd-1]
+    chord.roman_basic = roman
     chord_type = getChordType(chord, chord.borrowed)
 
 
@@ -147,8 +148,12 @@ def handleApplied(chord,mode):
     elif chord.emb == 9:
         roman+= ninth_qualities[chord.sec-1]
 
+    roman_basic = roman
 
     roman+=getEmbellishments(chord)
+
+    roman_basic+="/"+mode_dic_to_roman[mode][chord.scale_degree-1]
+    chord.roman_basic = roman_basic
 
     roman+="/"+mode_dic_to_roman[mode][chord.scale_degree-1]
 
@@ -165,6 +170,7 @@ def parseChord(chord, mode):
             roman = handleApplied(chord,mode)
         else:
             roman = mode_dic_to_roman[mode][chord.scale_degree-1]
+            chord.roman_basic = roman
             roman+=getChordType(chord,mode)
             roman+=getEmbellishments(chord)
 

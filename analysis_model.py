@@ -5,8 +5,8 @@ import tools
 class CorpusAnalysis:
     def __init__(self, filepath, gesture_rest):
         self.songs = tools.get_corpus_list(filepath)
-        #self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1,gesture_rest)
-        #self.harmonic_model = harmonic_analysis.HarmonicAnalysis(self.songs,1)
+        self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1,gesture_rest)
+        self.harmonic_model = harmonic_analysis.HarmonicAnalysis(self.songs,1)
 
     def print_songs(self):
         for song in self.songs:
