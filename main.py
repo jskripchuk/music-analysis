@@ -11,19 +11,19 @@ filepath = os.getcwd()+"/adele"
 
 #mem = analysis.HarmonicAnalysis()
 #print(obj.segments[0].chords[0])
-obj = analysis.CorpusAnalysis(filepath,1)
+obj = analysis.CorpusAnalysis(filepath,1.5)
 #obj.print_songs()
 #obj = analysis.MelodicAnalysis("data-files/adele_example/HKT_files_chorus",1,0.5)
 #print(obj.generate_line())
 #print(obj.generate_progression())
 
 
-print(obj.get_gestures_in_corpus())
-print(obj.generate_progression())
-print(obj.generate_melodic_sequence())
-print(obj.get_gestures_in_corpus())
+#print(obj.get_gestures_in_corpus())
+#print(obj.generate_progression())
+#print(obj.generate_melodic_sequence())
+#print(obj.get_gestures_in_corpus())
 print(obj.generate_harmonic_rhythm())
-
+#print(obj.get_gestures_in_corpus())
 
 #print(obj.gestures_in_corpus)
 #print(obj.gestures_in_corpus)

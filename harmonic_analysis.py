@@ -59,6 +59,8 @@ def calculate_statistics(songs):
     graphing.plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
     graphing.plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
 
+#def get_average_tempo(songs):
+    
 
 def generate_markov_model(songs, model_state_size):
     """
@@ -93,6 +95,7 @@ def generate_markov_model(songs, model_state_size):
             markovs.append(model)
 
     #Then we combine all the models in the list
+    #print(markovs)
 
     #print(markovs)
     combo = markovify.combine(markovs)
@@ -197,6 +200,7 @@ class HarmonicAnalysis:
 
         self.chords_per_measure = self.generate_chords_per_measure()
         self.chords_per_measure_tuple = self.generate_rhythm_tuple(self.chords_per_measure)
+        #print(self.chords_per_measure)
 
         #TODO
         #Implement
