@@ -105,7 +105,7 @@ def createChordJSON(chordJSON):
 	borrowed = chordJSON["borrowed"]
 	chord_duration = chordJSON["duration"]
 	start_measure = ((chordJSON["beat"]-1)//4)+1
-	start_beat = (chordJSON["beat"]-1)%4
+	start_beat = (chordJSON["beat"]-1)%4+1
 	start_beat_abs = chordJSON["beat"]
 	isRest = chordJSON["isRest"]
 	emb = chordJSON["type"]
