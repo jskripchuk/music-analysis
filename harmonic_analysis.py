@@ -115,7 +115,7 @@ def generate_rhythm_pattern(rhythm_prob, chords_per_measure):
         An array that contains a rhythmic pattern, where 0 is no hit and 1 is
         a hit. This array represents one segment of a song.
     """
-    print(rhythm_prob)
+    #print(rhythm_prob)
     #TODO
     #Account for time signatures other than 4/4
     #Add ability to skip measures or add more than one hit per measures,
@@ -271,9 +271,9 @@ class HarmonicAnalysis:
                         rhythm_array[start_beat]+=1
                     else:
                         print("Greater than 4/4!")
-            print()
+            #print()
 
-        print(rhythm_array)
+        #print(rhythm_array)
         return rhythm_array
 
     def generate_rhythm_tuple(self, array):
