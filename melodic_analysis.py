@@ -36,41 +36,85 @@ def generate_markov_model(songs, model_state_size):
 #Problemo
 #Gestures that are over the barline
 
+
+#Gestures now take it in terms of beats
+#16 beats in 4 bars
 def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
+    #print("SEG")
     number_of_gestures = 0
 
-    #Used to make sure we don't include a rest at the beginning as a gesture
     first_note = True
+
     for note in segment.melody:
-        if (note.scale_degree == "rest"
+        #print("YO")
+        if(note.isRest 
             and float(note.note_length) > gesture_rest_cutoff
             and not first_note):
-            #print(note.note_length)
-            #TODO check if it works
+            
+
+
+            #print("YO")
             if (float(note.start_measure) >= start
                 and float(note.start_measure) <= stop):
 
                 number_of_gestures+=1
+        #else:
+            #print(note.scale_degree)
 
         if first_note:
-            first_note = False
+            first_note = False 
+    #print("\n")
+    return number_of_gestures
+    
+    #Used to make sure we don't include a rest at the beginning as a gesture
+    #first_note = True
+    #for note in segment.melody:
+    #    if (note.isRest
+    #        and float(note.note_length) > gesture_rest_cutoff
+    #        and not first_note):
+            #print(note.note_length)
+            #TODO check if it works
+    #        if (float(note.start_measure) >= start
+    #            and float(note.start_measure) <= stop):
+
+    #            number_of_gestures+=1
+
+    #    if first_note:
+    #        first_note = False
 
         #print(note.start_measure+": "+note.scale_degree)
 
-    if len(segment.melody) != 0 and stop == 8:
-        if segment.melody[len(segment.melody)-1].scale_degree != "rest":
-            number_of_gestures+=1
-
-    return number_of_gestures
+    #return number_of_gestures
 
 def count_gesture_type_in_segment(segment, gesture_rest_cutoff):
-    first_four_bars = count_gestures_in_segment(segment,1,4,gesture_rest_cutoff)
-    #print("DONE")
-    second_four_bars = count_gestures_in_segment(segment,5,8,gesture_rest_cutoff)
-    #print("DONE")
-    eight_bars = count_gestures_in_segment(segment,1,8,gesture_rest_cutoff)
+    max_measure = int(segment.melody[-1].start_measure)
+    #print(max_measure)
 
-    return [first_four_bars,second_four_bars,eight_bars]
+    first_four_bars = []
+    second_four_bars = []
+    eight_bars = []
+
+    for i in range(1,max_measure, 8):
+        first_four_bars.append(count_gestures_in_segment(segment,i,i+3,gesture_rest_cutoff))
+        second_four_bars.append(count_gestures_in_segment(segment,i+4,i+7,gesture_rest_cutoff))
+        eight_bars.append(count_gestures_in_segment(segment,i,i+7,gesture_rest_cutoff))
+        #print([first_four_bars,second_four_bars,eight_bars])
+    
+    #first_four_bars = count_gestures_in_segment(segment,1,4,gesture_rest_cutoff)
+    #print("DONE")
+    #second_four_bars = count_gestures_in_segment(segment,5,8,gesture_rest_cutoff)
+    #print("DONE")
+    #eight_bars = count_gestures_in_segment(segment,1,8,gesture_rest_cutoff)
+    #print(first_four_bars)
+    #print(second_four_bars)
+    #print(eight_bars)
+    #print()
+    first_four_bar_average = statistics.mean(first_four_bars)
+    second_four_bar_average = statistics.mean(second_four_bars)
+    eight_bar_average = statistics.mean(eight_bars)
+
+    return[first_four_bar_average,second_four_bar_average,eight_bar_average]
+    #return [first_four_bars,second_four_bars,eight_bars]
 
 def average_gestures_per_song(song, gesture_rest_cutoff):
     first_four_bars = []

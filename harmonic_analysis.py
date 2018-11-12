@@ -59,6 +59,8 @@ def calculate_statistics(songs):
     graphing.plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
     graphing.plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
 
+#def get_average_tempo(songs):
+    
 
 def generate_markov_model(songs, model_state_size):
     """
@@ -80,15 +82,22 @@ def generate_markov_model(songs, model_state_size):
         #Each chord is sperated by a space
         text = ""
         for segment in song.segments:
+            #print(segment)
             for chord in segment.chordsNoRest:
+                #print(chord)
                 text+=chord.roman_basic+" "
+                #print(chord.roman_basic)
 
         #We create a seperate model for every song and put them into a list
         if text != '':
+            #print(text)
             model = markovify.Text(text,state_size=model_state_size)
             markovs.append(model)
 
     #Then we combine all the models in the list
+    #print(markovs)
+
+    #print(markovs)
     combo = markovify.combine(markovs)
 
     return combo
@@ -106,6 +115,7 @@ def generate_rhythm_pattern(rhythm_prob, chords_per_measure):
         An array that contains a rhythmic pattern, where 0 is no hit and 1 is
         a hit. This array represents one segment of a song.
     """
+    #print(rhythm_prob)
     #TODO
     #Account for time signatures other than 4/4
     #Add ability to skip measures or add more than one hit per measures,
@@ -191,6 +201,7 @@ class HarmonicAnalysis:
 
         self.chords_per_measure = self.generate_chords_per_measure()
         self.chords_per_measure_tuple = self.generate_rhythm_tuple(self.chords_per_measure)
+        #print(self.chords_per_measure)
 
         #TODO
         #Implement
@@ -252,14 +263,17 @@ class HarmonicAnalysis:
         for song in self.songs:
             for segment in song.segments:
                 for chord in segment.chordsNoRest:
+                    
                     start_beat = int(((float(chord.start_beat)-1)*2))
-
+                    #print(chord.start_beat)
                     #Make sure it doesn't break with greater than 4/4
                     if start_beat < 8:
                         rhythm_array[start_beat]+=1
                     else:
                         print("Greater than 4/4!")
+            #print()
 
+        #print(rhythm_array)
         return rhythm_array
 
     def generate_rhythm_tuple(self, array):
