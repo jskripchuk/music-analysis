@@ -48,7 +48,7 @@ def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
     for note in segment.melody:
         #print("YO")
         if(note.isRest 
-            and float(note.note_length) > gesture_rest_cutoff
+            and float(note.note_length) >= gesture_rest_cutoff
             and not first_note):
             
 
@@ -86,18 +86,35 @@ def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
 
     #return number_of_gestures
 
-def count_gesture_type_in_segment(segment, gesture_rest_cutoff):
+def count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse=False):
     max_measure = int(segment.melody[-1].start_measure)
     #print(max_measure)
 
     first_four_bars = []
     second_four_bars = []
     eight_bars = []
+    #reverse = False
+    #[0.13333333333333333, 0.18333333333333332, 0.31666666666666665]
+    #[0.05, 0.26666666666666666, 0.31666666666666665]
+    if(not reverse):
+        for i in range(1,max_measure, 8):
+            #print(((i,i+3),(i+4,i+7),(i,i+7)))
+            first_four_bars.append(count_gestures_in_segment(segment,i,i+3,gesture_rest_cutoff))
+            second_four_bars.append(count_gestures_in_segment(segment,i+4,i+7,gesture_rest_cutoff))
+            eight_bars.append(count_gestures_in_segment(segment,i,i+7,gesture_rest_cutoff))
+        #print("#############")
+    else:
+        for i in range(max_measure, 1, -8):
+            first_start = i-7
+            first_stop = i-4
+            second_start = i-3
 
-    for i in range(1,max_measure, 8):
-        first_four_bars.append(count_gestures_in_segment(segment,i,i+3,gesture_rest_cutoff))
-        second_four_bars.append(count_gestures_in_segment(segment,i+4,i+7,gesture_rest_cutoff))
-        eight_bars.append(count_gestures_in_segment(segment,i,i+7,gesture_rest_cutoff))
+            #print(((first_start, first_stop),(second_start,i),(first_start,i)))
+            first_four_bars.append(count_gestures_in_segment(segment,first_start,first_stop,gesture_rest_cutoff))
+            second_four_bars.append(count_gestures_in_segment(segment,second_start,i,gesture_rest_cutoff))
+            eight_bars.append(count_gestures_in_segment(segment,first_start,i,gesture_rest_cutoff))
+        #print("##############")
+        #print("Nut")
         #print([first_four_bars,second_four_bars,eight_bars])
     
     #first_four_bars = count_gestures_in_segment(segment,1,4,gesture_rest_cutoff)
@@ -109,20 +126,24 @@ def count_gesture_type_in_segment(segment, gesture_rest_cutoff):
     #print(second_four_bars)
     #print(eight_bars)
     #print()
+    
     first_four_bar_average = statistics.mean(first_four_bars)
     second_four_bar_average = statistics.mean(second_four_bars)
     eight_bar_average = statistics.mean(eight_bars)
 
+    #print((first_four_bar_average, second_four_bar_average, eight_bar_average))
+    #print("///////////////////")
+
     return[first_four_bar_average,second_four_bar_average,eight_bar_average]
     #return [first_four_bars,second_four_bars,eight_bars]
 
-def average_gestures_per_song(song, gesture_rest_cutoff):
+def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     first_four_bars = []
     second_four_bars = []
     eight_bars = []
 
     for segment in song.segments:
-        result = count_gesture_type_in_segment(segment, gesture_rest_cutoff)
+        result = count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse)
         first_four_bars.append(result[0])
         second_four_bars.append(result[1])
         eight_bars.append(result[2])
@@ -133,13 +154,13 @@ def average_gestures_per_song(song, gesture_rest_cutoff):
 
     return[first_four_bar_average,second_four_bar_average,eight_bar_average]
 
-def average_gestures_in_corpus(songs, gesture_rest_cutoff):
+def average_gestures_in_corpus(songs, gesture_rest_cutoff, reverse=False):
     first_four_bars = []
     second_four_bars = []
     eight_bars = []
 
     for song in songs:
-        result = average_gestures_per_song(song, gesture_rest_cutoff)
+        result = average_gestures_per_song(song, gesture_rest_cutoff, reverse)
         first_four_bars.append(result[0])
         second_four_bars.append(result[1])
         eight_bars.append(result[2])
@@ -160,9 +181,10 @@ def generate_solfege_histogram(songs):
 
 
 class MelodicAnalysis:
-    def __init__(self,songs,state_size,gesture_rest_cutoff):
+    def __init__(self,songs,state_size):
         self.songs = songs
-        self.gestures_in_corpus = average_gestures_in_corpus(self.songs, gesture_rest_cutoff)
+        #self.gesture_rest_cutoff = gesture_rest_cutoff
+        #self.gestures_in_corpus = average_gestures_in_corpus(self.songs, gesture_rest_cutoff)
         #generate_solfege_histogram(self.songs)
         #print(average_gestures_per_song(self.songs[0],gesture_rest_cutoff))
         self.markov_model = generate_markov_model(self.songs, state_size)
@@ -174,5 +196,5 @@ class MelodicAnalysis:
     def get_histogram(self):
         generate_solfege_histogram(self.songs)
 
-    def get_gestures_in_corpus(self):
-        return self.gestures_in_corpus
+    def get_gestures_in_corpus(self, gesture_cutoff, reverse=False):
+        return average_gestures_in_corpus(self.songs, gesture_cutoff,reverse)

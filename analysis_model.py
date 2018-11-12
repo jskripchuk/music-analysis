@@ -8,9 +8,9 @@ import statistics
 
 
 class CorpusAnalysis:
-    def __init__(self, filepath, gesture_rest):
+    def __init__(self, filepath):
         self.songs = tools.get_corpus_list(filepath)
-        self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1,gesture_rest)
+        self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1)
         self.harmonic_model = harmonic_analysis.HarmonicAnalysis(self.songs,1)
         
         self.tempo_list = []
@@ -36,17 +36,19 @@ class CorpusAnalysis:
         for stats in self.harmony_length_list:
             self.harmony_means.append(statistics.mean(stats))
 
-        print(self.harmony_means)
+        #print(self.harmony_means)
 
         bleh = []
         for i in self.songs:
             bleh.append(i.title)
+            #print(i.title)
+        #print(bleh)
 
-        print(self.tempo_list)
-        print(self.harmony_means)
+        #print(self.tempo_list)
+        #print(self.harmony_means)
         trace = go.Scatter(x=self.tempo_list,y=self.harmony_means, mode='markers', text=bleh)
         data = [trace]
-        plotly.offline.plot(data, filename='DATA')
+        #plotly.offline.plot(data, filename='DATA')
        # print(self.harmony_length_list)
 
     def print_songs(self):
@@ -66,8 +68,9 @@ class CorpusAnalysis:
     def generate_melodic_sequence(self):
         return self.melody_model.markov_model.make_sentence()
 
-    def get_gestures_in_corpus(self):
-        return self.melody_model.get_gestures_in_corpus()
+    def get_gestures_in_corpus(self,gesture_cutoff=1,reverse=False):
+        #print()
+        return self.melody_model.get_gestures_in_corpus(gesture_cutoff,reverse)
     
     def generate_harmonic_rhythm(self):
         return self.harmonic_model.generate_rhythm_vector()
