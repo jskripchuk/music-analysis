@@ -28,22 +28,22 @@ obj = analysis.CorpusAnalysis(filepath)
 
 
 
-for i in (0.25,0.5,1,1.5):
-    print("#######################")
-    print("Gesture Rest of "+str(i))
-    print("#######################")
-    #print("Forward ")
-    st = obj.get_gestures_in_corpus(i)
-    #print("Rev")
-    rev = obj.get_gestures_in_corpus(i, True)
-    print("Forward: " +str(st))
-    print("Reverse: "+str(rev))
-    average = []
+# for i in (0.25,0.5,1,1.5):
+#     print("#######################")
+#     print("Gesture Rest of "+str(i))
+#     print("#######################")
+#     #print("Forward ")
+#     st = obj.get_gestures_in_corpus(i)
+#     #print("Rev")
+#     rev = obj.get_gestures_in_corpus(i, True)
+#     print("Forward: " +str(st))
+#     print("Reverse: "+str(rev))
+#     average = []
 
-    for i in range(0,3):
-        average.append( (st[i]+rev[i])/2 )
-    print("Average: "+str(average))
-    print("-----------------------------------")
+#     for i in range(0,3):
+#         average.append( (st[i]+rev[i])/2 )
+#     print("Average: "+str(average))
+#     print("-----------------------------------")
     
     
 #print(obj.generate_harmonic_rhythm())
