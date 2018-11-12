@@ -88,9 +88,12 @@ def generate_markov_model(songs, model_state_size):
                 text+=chord.roman_basic+" "
                 #print(chord.roman_basic)
 
+        #Weird conversion here
+        text = str(text)
+
         #We create a seperate model for every song and put them into a list
         if text != '':
-            #print(text)
+            #print("Text: "+text)
             model = markovify.Text(text,state_size=model_state_size)
             markovs.append(model)
 

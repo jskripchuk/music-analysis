@@ -17,18 +17,27 @@ def generate_markov_model(songs, model_state_size):
         text = ""
         for segment in song.segments:
             for note in segment.melodyNoRest:
+                #print(note.scale_degree)
                 text+=note.scale_degree+" "
+        #text = "Hello dog aaa ffff ssss ffff"
+        #text = "3 3 4 5 5 5 5 5 4 4 4 5 1 4 4 4 4 3 3 3 1 3 3 3 3 3 4 3 3 1 3 4 5 4 3 4 5 5 5 7 7 4 5 4 3 4 5 4 4 4 4 3 3 3 1 3 3 3 3 4 3 3 1"
+        
+        #Weird conversion here
+        text = str(text)
 
         #We create a seperate model for every song and put them into a list
 
         #print(text)
         #text="A B C D E F G\n C D E F G E A G \n \n"
         if text != '':
+            #print("AAA")
+            #print(text)
             model = markovify.Text(text,state_size=model_state_size)
             markovs.append(model)
 
     #Then we combine all the models in the list
     combo = markovify.combine(markovs)
+    #print(combo.make_sentence())
 
     return combo
 
@@ -37,8 +46,8 @@ def generate_markov_model(songs, model_state_size):
 #Gestures that are over the barline
 
 
-#Gestures now take it in terms of beats
-#16 beats in 4 bars
+#Gestures now take print(
+#16 beats in 4 barsprint(
 def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
     #print("SEG")
     number_of_gestures = 0
@@ -188,6 +197,7 @@ class MelodicAnalysis:
         #generate_solfege_histogram(self.songs)
         #print(average_gestures_per_song(self.songs[0],gesture_rest_cutoff))
         self.markov_model = generate_markov_model(self.songs, state_size)
+        #print(self.markov_model.make_sentence())
         #print(count_gesture_type_in_segment(self.songs[0].segments[0],gesture_rest_cutoff))
 
     def generate_line(self):
