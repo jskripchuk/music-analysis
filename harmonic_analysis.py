@@ -36,27 +36,28 @@ def calculate_statistics(songs):
     getRoman = lambda chord: chord.roman
     getRomanBasic = lambda chord: chord.roman_basic
 
-    getExtensions = lambda chord: chord.extension_disc
-
-    getSus = lambda chord: chord.sus
+    getSus = lambda chord: chord.susString
     getEmb = lambda chord: chord.emb
+    getAdds = lambda chord: chord.addsString
 
     #Create histograms
-    full_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRoman)
-    basic_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRomanBasic)
-    extension_frequency = tools.createHistogram(songs,getChordsNoRest,getExtensions)
+    #full_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRoman)
+    #basic_chord_frequency = tools.createHistogram(songs,getChordsNoRest,getRomanBasic)
+    #extension_frequency = tools.createHistogram(songs,getChordsNoRest,getExtensions)
 
     #Merge sus and emb chords into one graph
-    sus_frequency = tools.createHistogram(songs,getChordsNoRest,getSus)
-    emb_frequency = tools.createHistogram(songs,getChordsNoRest,getEmb)
+    sus_frequency = tools.createHistogram(songs,getChordsNoRest, getSus)
+    extension_frequency = tools.createHistogram(songs,getChordsNoRest,getEmb)
+    adds_frequency = tools.createHistogram(songs,getChordsNoRest, getAdds)
 
-    total_emb_frequency = emb_frequency.copy()
-    total_emb_frequency.update(sus_frequency)
+    #total_sus_frequency = sus_frequency.copy()
+    #total_sus_frequency.update(adds_frequency)
 
     #Generate graphs
-    graphing.plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
-    graphing.plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
-    graphing.plotBarChartFromDict(total_emb_frequency,"Embellishments","embellishments")
+    #graphing.plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
+    #graphing.plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
+    graphing.plotBarChartFromDict(adds_frequency, "Additions", "additions")
+    graphing.plotBarChartFromDict(sus_frequency,"Suspensions","suspensions")
     graphing.plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
 
 #def get_average_tempo(songs):

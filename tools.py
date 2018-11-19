@@ -34,9 +34,10 @@ def createHistogram(songs, segFunc, varFunc):
 
     for song in songs:
         for segment in song.segments:
+            #print(segment)
             for obj in segFunc(segment):
+                #print(obj)
                 inHisto = False
-
                 #If it is in the histogram, then increment the tally
                 for key in histogram:
                     if varFunc(obj) == key:

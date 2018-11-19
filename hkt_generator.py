@@ -72,6 +72,26 @@ class Chord:
 		self.extension_disc = ""
 		self.accidental = ""
 		self.adds = adds
+		self.susString = self.getSusString()
+		self.addsString = self.getAddsString()
+
+	def getSusString(self):
+		if self.sus == []:
+			return None
+		
+		st =  "sus"
+		for i in self.sus:
+			st+=str(i)
+		return st
+	
+	def getAddsString(self):
+		if self.adds == []:
+			return None
+		
+		st =  "add"
+		for i in self.adds:
+			st+=str(i)
+		return st
 
 def createChord(chordDom):
 	scale_degree = getData(chordDom, "sd")
