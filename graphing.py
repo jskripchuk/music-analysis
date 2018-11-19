@@ -18,4 +18,4 @@ def plotBarChart(x_data, y_data,tit,output):
     )]
 
     fig = go.Figure(data = data_comp, layout=layout_comp)
-    plotly.offline.plot(fig, filename="graphs/"+output)
+    plotly.offline.plot(fig, filename="graphs/"+output, auto_open=False)
