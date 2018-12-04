@@ -180,14 +180,20 @@ def average_gestures_in_corpus(songs, gesture_rest_cutoff, reverse=False):
 
     return[first_four_bar_average,second_four_bar_average,eight_bar_average]
 
-def generate_solfege_histogram(songs):
+def generate_solfege_histogram(songs, filename):
     getMelodyNoRest = lambda segment: segment.melodyNoRest
     getScaleDegree = lambda note: note.scale_degree
 
     solfege= tools.createHistogram(songs,getMelodyNoRest,getScaleDegree)
 
-    graphing.plotBarChartFromDict(solfege,"Solfege","solfege")
+    graphing.plotBarChartFromDict(solfege,"Solfege",filename+"_solfege")
 
+def generate_rhythm_histogram(songs, filename):
+    getMelodyNoRest = lambda segment: segment.melodyNoRest
+    getRhythm = lambda note: note.note_length
+
+    lengths = tools.createHistogram(songs, getMelodyNoRest, getRhythm)
+    graphing.plotBarChartFromDict(lengths, "Melody Rhythms",filename+"_note_lengths")
 
 class MelodicAnalysis:
     def __init__(self,songs,state_size):
@@ -203,8 +209,11 @@ class MelodicAnalysis:
     def generate_line(self):
         return self.markov_model.make_sentence()
 
-    def get_histogram(self):
-        generate_solfege_histogram(self.songs)
+    def get_solfege_histogram(self, filename):
+        generate_solfege_histogram(self.songs, filename)
+
+    def get_note_length_histogram(self, filename):
+        generate_rhythm_histogram(self.songs, filename)
 
     def get_gestures_in_corpus(self, gesture_cutoff, reverse=False):
         return average_gestures_in_corpus(self.songs, gesture_cutoff,reverse)

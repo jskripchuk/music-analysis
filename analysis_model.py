@@ -9,6 +9,7 @@ import statistics
 
 class CorpusAnalysis:
     def __init__(self, filepath):
+        self.filename = filepath.split("/")[-1]
         self.songs = tools.get_corpus_list(filepath)
         self.melody_model = melodic_analysis.MelodicAnalysis(self.songs,1)
         self.harmonic_model = harmonic_analysis.HarmonicAnalysis(self.songs,1)
@@ -76,10 +77,11 @@ class CorpusAnalysis:
         return self.harmonic_model.generate_rhythm_vector()
 
     def calculate_statistics(self):
-        return self.harmonic_model.get_statistics()
+        return self.harmonic_model.get_statistics(self.filename)
 
-    def get_solfege_histogram(self):
-        self.melody_model.get_histogram()
+    def get_melody_histograms(self):
+        self.melody_model.get_solfege_histogram(self.filename)
+        self.melody_model.get_note_length_histogram(self.filename)
 
     #Does song tempo influence chord length?
     def get_tempo_stats(self):

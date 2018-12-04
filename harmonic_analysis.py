@@ -17,7 +17,7 @@ progression and rhythm.
 """
 
 
-def calculate_statistics(songs):
+def calculate_statistics(songs, filename):
     """
     Calulates various statistics based on a Hooktheory corpus, and generates
     multiple graphs and bar charts.
@@ -56,9 +56,9 @@ def calculate_statistics(songs):
     #Generate graphs
     #graphing.plotBarChartFromDict(basic_chord_frequency,"Basic Chord Types","basic_roman_numerals")
     #graphing.plotBarChartFromDict(full_chord_frequency,"Chord Types with Extensions","full_roman_numerals")
-    graphing.plotBarChartFromDict(adds_frequency, "Additions", "additions")
-    graphing.plotBarChartFromDict(sus_frequency,"Suspensions","suspensions")
-    graphing.plotBarChartFromDict(extension_frequency,"Just Extensions","extensions")
+    graphing.plotBarChartFromDict(adds_frequency, "Additions", filename+"_additions")
+    graphing.plotBarChartFromDict(sus_frequency,"Suspensions",filename+"_suspensions")
+    graphing.plotBarChartFromDict(extension_frequency,"Just Extensions",filename+"_extensions")
 
 #def get_average_tempo(songs):
     
@@ -215,8 +215,8 @@ class HarmonicAnalysis:
     def generate_progression(self):
         return self.markov_model.make_sentence()
 
-    def get_statistics(self):
-        return calculate_statistics(self.songs)
+    def get_statistics(self, filename):
+        return calculate_statistics(self.songs, filename)
 
     #Makes a general histogram of how many chords per measure the corpus has
     #chord_array[0] = number of times chords last longer than 1 measure
