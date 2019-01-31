@@ -169,7 +169,7 @@ def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     else:
         second_four_bar_average = 0
 
-    if len(eight_bars) = 0:
+    if len(eight_bars) == 0:
         eight_bar_average = statistics.mean(eight_bars)
     else:
         eight_bar_average = 0
