@@ -169,7 +169,7 @@ def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     else:
         second_four_bar_average = 0
 
-    if len(eight_bars) == 0:
+    if len(eight_bars) != 0:
         eight_bar_average = statistics.mean(eight_bars)
     else:
         eight_bar_average = 0
@@ -187,6 +187,8 @@ def average_gestures_in_corpus(songs, gesture_rest_cutoff, reverse=False):
             first_four_bars.append(result[0])
             second_four_bars.append(result[1])
             eight_bars.append(result[2])
+        else:
+            print("No Melody! Skipping song.")
 
     first_four_bar_average = statistics.mean(first_four_bars)
     second_four_bar_average = statistics.mean(second_four_bars)
