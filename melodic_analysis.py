@@ -182,7 +182,7 @@ def average_gestures_in_corpus(songs, gesture_rest_cutoff, reverse=False):
     eight_bars = []
 
     for song in songs:
-        if len(song.segment.melody) != 0:
+        if len(song.segments[0].melody) != 0:
             result = average_gestures_per_song(song, gesture_rest_cutoff, reverse)
             first_four_bars.append(result[0])
             second_four_bars.append(result[1])
