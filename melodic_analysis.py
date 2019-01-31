@@ -146,12 +146,14 @@ def count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse=False):
     return[first_four_bar_average,second_four_bar_average,eight_bar_average]
     #return [first_four_bars,second_four_bars,eight_bars]
 
+###TODO: CHECK IF THE SONG ACTUALLY HAS A MELODY YA DINUGS
 def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     first_four_bars = []
     second_four_bars = []
     eight_bars = []
 
     for segment in song.segments:
+        print(segment)
         result = count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse)
         first_four_bars.append(result[0])
         second_four_bars.append(result[1])
