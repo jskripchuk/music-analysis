@@ -4,7 +4,7 @@ import os
 #os.chdir("C:\\Users\\Jimmy\\Documents\\GitHub\\music-analysis")
 #print(os.getcwd())
 
-filepath = os.getcwd()+"/adele"
+filepath = os.getcwd()+"/JSON_chorus"
 obj = analysis.CorpusAnalysis(filepath)
 
 #print(obj.generate_line())
