@@ -153,7 +153,6 @@ def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     eight_bars = []
 
     for segment in song.segments:
-        print(segment)
         if len(segment.melody) != 0:
             result = count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse)
             first_four_bars.append(result[0])
