@@ -235,23 +235,25 @@ class HarmonicAnalysis:
                     last_chord_start_measure = segment.chordsNoRest[0].start_measure
                     tally = 1
 
+                    #TODO REMOVE WHY TALLY IS DOING BAD?
                     for i in range(1, len(segment.chordsNoRest)):
-                        #If the difference in measures between sucesssive chords is >1, that means that
-                        #there is a chord longer than one measure between them
-                        if int(segment.chordsNoRest[i].start_measure)-int(last_chord_start_measure) > 1:
-                            chord_array[0]+=1
+                        if tally < 8:
+                            #If the difference in measures between sucesssive chords is >1, that means that
+                            #there is a chord longer than one measure between them
+                            if int(segment.chordsNoRest[i].start_measure)-int(last_chord_start_measure) > 1:
+                                chord_array[0]+=1
 
-                        #Tally chords that have the same start measure
-                        if segment.chordsNoRest[i].start_measure == last_chord_start_measure:
-                            tally+=1
-                        else:
-                            #Increment and reset the tally once a new measure starts
-                            chord_array[tally]+=1
-                            tally = 1
+                            #Tally chords that have the same start measure
+                            if segment.chordsNoRest[i].start_measure == last_chord_start_measure:
+                                tally+=1
+                            else:
+                                #Increment and reset the tally once a new measure starts
+                                chord_array[tally]+=1
+                                tally = 1
 
-                        last_chord_start_measure = segment.chordsNoRest[i].start_measure
-
-                    chord_array[tally]+=1
+                            last_chord_start_measure = segment.chordsNoRest[i].start_measure
+                    if tally < 8:
+                        chord_array[tally]+=1
 
         return chord_array
 

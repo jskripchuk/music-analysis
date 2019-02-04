@@ -4,14 +4,14 @@ import os
 #os.chdir("C:\\Users\\Jimmy\\Documents\\GitHub\\music-analysis")
 #print(os.getcwd())
 
-filepath = os.getcwd()+"/JSON_chorus"
+filepath = os.getcwd()+"/green"
 obj = analysis.CorpusAnalysis(filepath)
 
 #print(obj.generate_line())
 #print(obj.generate_progression())
 print(obj.get_gestures_in_corpus())
 #print(obj.generate_melodic_sequence())
-#print(obj.generate_harmonic_rhythm())
+print(obj.generate_harmonic_rhythm())
 #print(obj.get_tempo_stats())
 #obj.calculate_statistics()
 #obj.get_melody_histograms()
