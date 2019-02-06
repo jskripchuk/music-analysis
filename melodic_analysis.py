@@ -1,3 +1,9 @@
+"""
+melodic_analysis.py
+
+Compiles all of the melodic data and places it in a Markov Model.
+"""
+
 import hkt_generator
 import markovify
 import statistics
@@ -9,6 +15,17 @@ from os import listdir
 
 
 def generate_markov_model(songs, model_state_size):
+    """
+    Takes in a list of HKT songs, and generates a combined markov model based
+    off of the melodies in the songs.
+
+    Args:
+        songs: A list of HKT songs.
+        model_state_size: How many instances the markov model should consider in a state
+
+    Returns:
+        A combined markov model build off of all the songs
+    """
     markovs = []
 
     for song in songs:
@@ -17,136 +34,70 @@ def generate_markov_model(songs, model_state_size):
         text = ""
         for segment in song.segments:
             for note in segment.melodyNoRest:
-                #print(note.scale_degree)
                 text+=note.scale_degree+" "
-        #text = "Hello dog aaa ffff ssss ffff"
-        #text = "3 3 4 5 5 5 5 5 4 4 4 5 1 4 4 4 4 3 3 3 1 3 3 3 3 3 4 3 3 1 3 4 5 4 3 4 5 5 5 7 7 4 5 4 3 4 5 4 4 4 4 3 3 3 1 3 3 3 3 4 3 3 1"
         
-        #Weird conversion here
         text = str(text)
 
         #We create a seperate model for every song and put them into a list
-
-        #print(text)
-        #text="A B C D E F G\n C D E F G E A G \n \n"
         if text != '':
-            #print("AAA")
-            #print(text)
             model = markovify.Text(text,state_size=model_state_size)
             markovs.append(model)
 
     #Then we combine all the models in the list
     combo = markovify.combine(markovs)
-    #print(combo.make_sentence())
-
     return combo
 
-
-#Problemo
-#Gestures that are over the barline
-
-
-#Gestures now take print(
-#16 beats in 4 barsprint(
 def count_gestures_in_segment(segment, start, stop, gesture_rest_cutoff):
-    #print("SEG")
     number_of_gestures = 0
 
     first_note = True
 
     for note in segment.melody:
-        #print("YO")
         if(note.isRest 
             and float(note.note_length) >= gesture_rest_cutoff
             and not first_note):
             
-
-
-            #print("YO")
             if (float(note.start_measure) >= start
                 and float(note.start_measure) <= stop):
 
                 number_of_gestures+=1
-        #else:
-            #print(note.scale_degree)
 
         if first_note:
             first_note = False 
-    #print("\n")
+
     return number_of_gestures
-    
-    #Used to make sure we don't include a rest at the beginning as a gesture
-    #first_note = True
-    #for note in segment.melody:
-    #    if (note.isRest
-    #        and float(note.note_length) > gesture_rest_cutoff
-    #        and not first_note):
-            #print(note.note_length)
-            #TODO check if it works
-    #        if (float(note.start_measure) >= start
-    #            and float(note.start_measure) <= stop):
-
-    #            number_of_gestures+=1
-
-    #    if first_note:
-    #        first_note = False
-
-        #print(note.start_measure+": "+note.scale_degree)
-
-    #return number_of_gestures
 
 def count_gesture_type_in_segment(segment, gesture_rest_cutoff, reverse=False):
+
+    #Looks at the last melody note in the list and determines what measure it starts on
     max_measure = int(segment.melody[-1].start_measure)
-    #print(max_measure)
 
     first_four_bars = []
     second_four_bars = []
     eight_bars = []
-    #reverse = False
-    #[0.13333333333333333, 0.18333333333333332, 0.31666666666666665]
-    #[0.05, 0.26666666666666666, 0.31666666666666665]
+
     if(not reverse):
         for i in range(1,max_measure, 8):
-            #print(((i,i+3),(i+4,i+7),(i,i+7)))
             first_four_bars.append(count_gestures_in_segment(segment,i,i+3,gesture_rest_cutoff))
             second_four_bars.append(count_gestures_in_segment(segment,i+4,i+7,gesture_rest_cutoff))
             eight_bars.append(count_gestures_in_segment(segment,i,i+7,gesture_rest_cutoff))
-        #print("#############")
     else:
         for i in range(max_measure, 1, -8):
             first_start = i-7
             first_stop = i-4
             second_start = i-3
 
-            #print(((first_start, first_stop),(second_start,i),(first_start,i)))
             first_four_bars.append(count_gestures_in_segment(segment,first_start,first_stop,gesture_rest_cutoff))
             second_four_bars.append(count_gestures_in_segment(segment,second_start,i,gesture_rest_cutoff))
             eight_bars.append(count_gestures_in_segment(segment,first_start,i,gesture_rest_cutoff))
-        #print("##############")
-        #print("Nut")
-        #print([first_four_bars,second_four_bars,eight_bars])
-    
-    #first_four_bars = count_gestures_in_segment(segment,1,4,gesture_rest_cutoff)
-    #print("DONE")
-    #second_four_bars = count_gestures_in_segment(segment,5,8,gesture_rest_cutoff)
-    #print("DONE")
-    #eight_bars = count_gestures_in_segment(segment,1,8,gesture_rest_cutoff)
-    #print(first_four_bars)
-    #print(second_four_bars)
-    #print(eight_bars)
-    #print()
+        
     
     first_four_bar_average = statistics.mean(first_four_bars)
     second_four_bar_average = statistics.mean(second_four_bars)
     eight_bar_average = statistics.mean(eight_bars)
 
-    #print((first_four_bar_average, second_four_bar_average, eight_bar_average))
-    #print("///////////////////")
-
     return[first_four_bar_average,second_four_bar_average,eight_bar_average]
-    #return [first_four_bars,second_four_bars,eight_bars]
 
-###TODO: CHECK IF THE SONG ACTUALLY HAS A MELODY YA DINUGS
 def average_gestures_per_song(song, gesture_rest_cutoff, reverse=False):
     first_four_bars = []
     second_four_bars = []
@@ -214,13 +165,7 @@ def generate_rhythm_histogram(songs, filename):
 class MelodicAnalysis:
     def __init__(self,songs,state_size):
         self.songs = songs
-        #self.gesture_rest_cutoff = gesture_rest_cutoff
-        #self.gestures_in_corpus = average_gestures_in_corpus(self.songs, gesture_rest_cutoff)
-        #generate_solfege_histogram(self.songs)
-        #print(average_gestures_per_song(self.songs[0],gesture_rest_cutoff))
         self.markov_model = generate_markov_model(self.songs, state_size)
-        #print(self.markov_model.make_sentence())
-        #print(count_gesture_type_in_segment(self.songs[0].segments[0],gesture_rest_cutoff))
 
     def generate_line(self):
         return self.markov_model.make_sentence()

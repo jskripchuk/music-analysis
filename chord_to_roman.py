@@ -91,7 +91,7 @@ ninth_qualities = [maj9,min9,flat9,maj9,dom9,min9,flat9]
 
 def handleBorrowedChord(chord,current_mode,current_mode_num):
     """
-    Takes in a HKT borrwed chord, and then converts it to it's correct roman
+    Takes in a HKT borrowed chord, and then converts it to it's correct roman
     numeral notation.
 
     Args:
@@ -172,7 +172,6 @@ def getEmbellishment(chord):
         if there is not.
     """
 
-   # print(chord.adds)
     if chord.adds != []:
         return "add"+"".join(map(str,chord.adds))
     else:

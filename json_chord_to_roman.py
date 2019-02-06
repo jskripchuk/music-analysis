@@ -1,3 +1,11 @@
+"""
+json_chord_to_roman.py
+
+Used to conver the HKT_Object representation of a chord,
+and convert it to a roman numeral. This is specifically for a JSON representation.
+
+"""
+
 import functools
 
 #The chord functions of the basic diatonic modes
