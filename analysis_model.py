@@ -1,7 +1,7 @@
 import melodic_analysis
 import harmonic_analysis
 import tools
-import plotly.plotly
+import chart_studio.plotly
 import plotly.graph_objs as go
 import statistics 
 
