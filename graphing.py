@@ -1,4 +1,5 @@
 import chart_studio.plotly
+import plotly
 import plotly.graph_objs as go
 
 def plotBarChartFromDict(dic,title,output):
